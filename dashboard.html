@@ -1,0 +1,2090 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Dealism Dashboard</title>
+  <style>
+    :root {
+      color-scheme: dark;
+      --bg: #14110f;
+      --bg-elevated: rgba(35, 28, 24, 0.88);
+      --panel: rgba(28, 23, 20, 0.94);
+      --panel-soft: rgba(43, 34, 29, 0.9);
+      --stroke: rgba(255, 255, 255, 0.08);
+      --stroke-strong: rgba(255, 255, 255, 0.14);
+      --text: #f8f4ef;
+      --muted: #b5a99d;
+      --blue: #8bb7ff;
+      --blue-strong: #2f6cf6;
+      --green: #30d27b;
+      --green-soft: rgba(48, 210, 123, 0.18);
+      --amber: #dfb48e;
+      --red: #ff6c62;
+      --shadow: 0 28px 80px rgba(0, 0, 0, 0.32);
+      --radius: 24px;
+      --radius-sm: 16px;
+      --page-grad-1: rgba(47, 108, 246, 0.14);
+      --page-grad-2: rgba(48, 210, 123, 0.1);
+      --page-grad-3-start: #181412;
+      --page-grad-3-end: #120f0d;
+      --field-bg: rgba(255, 255, 255, 0.035);
+      --field-focus-bg: rgba(255, 255, 255, 0.06);
+      --surface-soft: rgba(255, 255, 255, 0.035);
+      --surface-softer: rgba(255, 255, 255, 0.015);
+      --hover-row: rgba(255, 255, 255, 0.03);
+      --grid-line: rgba(255, 255, 255, 0.08);
+      --chart-label: rgba(255, 255, 255, 0.55);
+      --chart-title: rgba(255, 255, 255, 0.65);
+      --button-secondary-bg: rgba(255, 255, 255, 0.06);
+      --button-secondary-text: var(--text);
+      --button-danger-text: #ffd5d1;
+      --button-danger-bg: rgba(255, 108, 98, 0.12);
+      --button-danger-border: rgba(255, 108, 98, 0.22);
+    }
+
+    :root[data-theme="light"] {
+      color-scheme: light;
+      --bg: #f7f1e8;
+      --bg-elevated: rgba(255, 255, 255, 0.92);
+      --panel: rgba(255, 252, 247, 0.92);
+      --panel-soft: rgba(245, 238, 229, 0.98);
+      --stroke: rgba(53, 41, 27, 0.1);
+      --stroke-strong: rgba(53, 41, 27, 0.16);
+      --text: #221912;
+      --muted: #6e6257;
+      --shadow: 0 24px 60px rgba(79, 58, 32, 0.12);
+      --page-grad-1: rgba(47, 108, 246, 0.1);
+      --page-grad-2: rgba(48, 210, 123, 0.08);
+      --page-grad-3-start: #fff9f1;
+      --page-grad-3-end: #efe4d3;
+      --field-bg: rgba(34, 25, 18, 0.04);
+      --field-focus-bg: rgba(34, 25, 18, 0.07);
+      --surface-soft: rgba(34, 25, 18, 0.04);
+      --surface-softer: rgba(34, 25, 18, 0.025);
+      --hover-row: rgba(34, 25, 18, 0.04);
+      --grid-line: rgba(34, 25, 18, 0.1);
+      --chart-label: rgba(34, 25, 18, 0.6);
+      --chart-title: rgba(34, 25, 18, 0.72);
+      --button-secondary-bg: rgba(34, 25, 18, 0.05);
+      --button-secondary-text: #221912;
+      --button-danger-text: #a9342c;
+      --button-danger-bg: rgba(255, 108, 98, 0.1);
+      --button-danger-border: rgba(169, 52, 44, 0.2);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html,
+    body {
+      margin: 0;
+      min-height: 100%;
+      font-family: "Avenir Next", "PingFang SC", "Segoe UI", sans-serif;
+      background:
+        radial-gradient(circle at top left, var(--page-grad-1), transparent 28%),
+        radial-gradient(circle at top right, var(--page-grad-2), transparent 24%),
+        linear-gradient(180deg, var(--page-grad-3-start) 0%, var(--page-grad-3-end) 100%);
+      color: var(--text);
+    }
+
+    body {
+      padding: 28px;
+    }
+
+    .shell {
+      display: grid;
+      grid-template-columns: 340px minmax(0, 1fr);
+      gap: 24px;
+      align-items: start;
+    }
+
+    .panel {
+      background: var(--panel);
+      border: 1px solid var(--stroke);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(18px);
+    }
+
+    .sidebar {
+      position: sticky;
+      top: 24px;
+      padding: 24px;
+      display: grid;
+      gap: 20px;
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      color: var(--muted);
+      font-size: 13px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .eyebrow::before {
+      content: "";
+      width: 10px;
+      height: 10px;
+      border-radius: 999px;
+      background: linear-gradient(135deg, var(--green), var(--blue));
+      box-shadow: 0 0 16px rgba(48, 210, 123, 0.6);
+    }
+
+    h1,
+    h2,
+    h3,
+    p {
+      margin: 0;
+    }
+
+    .sidebar h1 {
+      margin-top: 10px;
+      font-size: 32px;
+      line-height: 1.02;
+      letter-spacing: -0.04em;
+    }
+
+    .lede {
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.7;
+    }
+
+    .field-grid {
+      display: grid;
+      gap: 14px;
+    }
+
+    .field-grid.two {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    label {
+      display: grid;
+      gap: 8px;
+      font-size: 13px;
+      color: var(--muted);
+    }
+
+    input,
+    textarea,
+    select,
+    button {
+      font: inherit;
+    }
+
+    input,
+    textarea,
+    select {
+      width: 100%;
+      border: 1px solid var(--stroke);
+      border-radius: 14px;
+      background: var(--field-bg);
+      color: var(--text);
+      padding: 12px 14px;
+      outline: none;
+      transition: border-color 0.2s ease, transform 0.2s ease, background 0.2s ease;
+    }
+
+    input:focus,
+    textarea:focus,
+    select:focus {
+      border-color: rgba(139, 183, 255, 0.7);
+      background: var(--field-focus-bg);
+      transform: translateY(-1px);
+    }
+
+    textarea {
+      min-height: 142px;
+      resize: vertical;
+      line-height: 1.6;
+    }
+
+    .button-row {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    button {
+      border: 0;
+      border-radius: 999px;
+      padding: 12px 18px;
+      cursor: pointer;
+      transition: transform 0.2s ease, opacity 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    button:hover {
+      transform: translateY(-1px);
+    }
+
+    .button-primary {
+      color: #06111f;
+      background: linear-gradient(135deg, #7ec7ff, #57f0af);
+      box-shadow: 0 12px 24px rgba(87, 240, 175, 0.18);
+    }
+
+    .button-secondary {
+      color: var(--button-secondary-text);
+      background: var(--button-secondary-bg);
+      border: 1px solid var(--stroke);
+    }
+
+    .button-danger {
+      color: var(--button-danger-text);
+      background: var(--button-danger-bg);
+      border: 1px solid var(--button-danger-border);
+    }
+
+    .helper {
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.65;
+    }
+
+    .status {
+      min-height: 22px;
+      font-size: 13px;
+      color: var(--green);
+    }
+
+    .control-switch {
+      display: grid;
+      gap: 8px;
+      max-width: 220px;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .main {
+      display: grid;
+      gap: 24px;
+    }
+
+    .hero {
+      padding: 24px;
+      display: flex;
+      justify-content: space-between;
+      gap: 18px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .hero-copy {
+      max-width: 620px;
+    }
+
+    .hero-copy h2 {
+      margin-top: 12px;
+      font-size: 30px;
+      letter-spacing: -0.04em;
+    }
+
+    .hero-copy p {
+      margin-top: 12px;
+      color: var(--muted);
+      line-height: 1.7;
+    }
+
+    .chip-group {
+      display: inline-flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .chip {
+      padding: 11px 14px;
+      border-radius: 14px;
+      border: 1px solid var(--stroke);
+      background: var(--surface-soft);
+      color: var(--text);
+      font-size: 13px;
+    }
+
+    .metrics {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 16px;
+    }
+
+    .metric-card {
+      padding: 22px;
+      display: grid;
+      gap: 10px;
+      min-height: 148px;
+      background:
+        linear-gradient(180deg, rgba(255, 255, 255, 0.04), transparent 64%),
+        var(--panel);
+    }
+
+    .metric-title {
+      color: var(--muted);
+      font-size: 13px;
+      letter-spacing: 0.03em;
+      text-transform: uppercase;
+    }
+
+    .metric-value {
+      font-size: 34px;
+      line-height: 1;
+      letter-spacing: -0.05em;
+    }
+
+    .metric-footnote {
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.6;
+    }
+
+    .chart-card {
+      padding: 24px;
+      display: grid;
+      gap: 18px;
+    }
+
+    .card-header {
+      display: flex;
+      justify-content: space-between;
+      gap: 16px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .card-header p {
+      color: var(--muted);
+      margin-top: 6px;
+      font-size: 14px;
+    }
+
+    .header-actions {
+      display: inline-flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      align-items: center;
+    }
+
+    .segmented {
+      display: inline-flex;
+      padding: 4px;
+      border-radius: 14px;
+      border: 1px solid var(--stroke);
+      background: var(--surface-soft);
+    }
+
+    .segmented button {
+      background: transparent;
+      border-radius: 10px;
+      color: var(--muted);
+      padding: 9px 14px;
+    }
+
+    .segmented button.active {
+      background: var(--field-focus-bg);
+      color: var(--text);
+    }
+
+    .chart-wrap {
+      background:
+        linear-gradient(180deg, var(--surface-soft), transparent 100%),
+        var(--surface-softer);
+      border: 1px solid var(--stroke);
+      border-radius: 20px;
+      padding: 18px;
+    }
+
+    #trend-chart {
+      width: 100%;
+      height: 380px;
+      display: block;
+    }
+
+    .legend {
+      display: flex;
+      gap: 18px;
+      flex-wrap: wrap;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .legend span {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .legend i {
+      width: 10px;
+      height: 10px;
+      border-radius: 999px;
+      display: inline-block;
+    }
+
+    .split {
+      display: grid;
+      grid-template-columns: minmax(0, 1.15fr) minmax(320px, 0.85fr);
+      gap: 24px;
+    }
+
+    .table-card,
+    .funnel-card,
+    .records-card {
+      padding: 24px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    th,
+    td {
+      padding: 14px 12px;
+      border-bottom: 1px solid var(--stroke);
+      text-align: left;
+      font-size: 14px;
+    }
+
+    th {
+      color: var(--muted);
+      font-weight: 500;
+    }
+
+    tbody tr:hover {
+      background: var(--hover-row);
+    }
+
+    tbody tr[data-date] {
+      cursor: pointer;
+    }
+
+    .positive {
+      color: var(--green);
+    }
+
+    .negative {
+      color: var(--red);
+    }
+
+    .neutral {
+      color: var(--muted);
+    }
+
+    .funnel-card {
+      display: grid;
+      gap: 18px;
+    }
+
+    .funnel-grid {
+      display: grid;
+      gap: 14px;
+    }
+
+    .bar-block {
+      display: grid;
+      gap: 8px;
+    }
+
+    .bar-meta {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .bar-track {
+      height: 16px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.06);
+      overflow: hidden;
+      border: 1px solid rgba(255, 255, 255, 0.04);
+    }
+
+    .bar-fill {
+      height: 100%;
+      border-radius: 999px;
+      background: linear-gradient(90deg, rgba(139, 183, 255, 0.95), rgba(48, 210, 123, 0.95));
+    }
+
+    .funnel-notes {
+      display: grid;
+      gap: 10px;
+      padding-top: 6px;
+    }
+
+    .note-row {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 12px 14px;
+      border-radius: 16px;
+      background: rgba(255, 255, 255, 0.035);
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .records-card {
+      display: grid;
+      gap: 16px;
+    }
+
+    .records-scroll {
+      overflow: auto;
+      border: 1px solid var(--stroke);
+      border-radius: 18px;
+    }
+
+    .empty-state {
+      color: var(--muted);
+      padding: 36px 18px;
+      text-align: center;
+    }
+
+    .muted {
+      color: var(--muted);
+    }
+
+    @media (max-width: 1180px) {
+      .shell {
+        grid-template-columns: 1fr;
+      }
+
+      .sidebar {
+        position: static;
+      }
+
+      .metrics,
+      .split {
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+
+    @media (max-width: 760px) {
+      body {
+        padding: 16px;
+      }
+
+      .metrics,
+      .split,
+      .field-grid.two {
+        grid-template-columns: 1fr;
+      }
+
+      .hero-copy h2,
+      .sidebar h1 {
+        font-size: 26px;
+      }
+
+      .metric-value {
+        font-size: 28px;
+      }
+
+      #trend-chart {
+        height: 300px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="shell">
+    <aside class="panel sidebar">
+      <div>
+        <span class="eyebrow" id="sidebar-eyebrow">Dealism Performance</span>
+        <h1 id="sidebar-title">成交分析台</h1>
+        <p class="lede" id="sidebar-lede">录入每天的成交额、订单、线索和成交客户数，页面会自动生成趋势图、核心指标和转化分析。所有数据只保存在当前浏览器。</p>
+      </div>
+
+      <label class="control-switch">
+        <span id="language-label">界面语言</span>
+        <select id="language-select">
+          <option value="zh">中文</option>
+          <option value="en">English</option>
+          <option value="pt-BR">Português (Brasil)</option>
+          <option value="es">Español</option>
+        </select>
+      </label>
+
+      <label class="control-switch">
+        <span id="theme-label">界面主题</span>
+        <select id="theme-select">
+          <option value="dark">深色模式</option>
+          <option value="light">浅色模式</option>
+        </select>
+      </label>
+
+      <section>
+        <div class="card-header">
+          <div>
+            <h3 id="daily-title">单日录入</h3>
+            <p class="helper" id="daily-helper">同一天重复保存会自动覆盖更新。</p>
+          </div>
+        </div>
+        <div class="field-grid" style="margin-top: 14px;">
+          <label>
+            <span id="label-date">日期</span>
+            <input id="input-date" type="date">
+          </label>
+          <label>
+            <span id="label-revenue">成交额</span>
+            <input id="input-revenue" type="number" min="0" step="0.01" placeholder="例如 128000">
+          </label>
+          <div class="field-grid two">
+            <label>
+              <span id="label-orders">订单量</span>
+              <input id="input-orders" type="number" min="0" step="1" placeholder="例如 14">
+            </label>
+            <label>
+              <span id="label-leads">线索量</span>
+              <input id="input-leads" type="number" min="0" step="1" placeholder="例如 52">
+            </label>
+          </div>
+          <label>
+            <span id="label-customers">成交客户数</span>
+            <input id="input-customers" type="number" min="0" step="1" placeholder="例如 9">
+          </label>
+          <div class="button-row">
+            <button class="button-primary" id="save-record">保存数据</button>
+            <button class="button-secondary" id="prefill-sample">载入示例</button>
+          </div>
+          <div class="status" id="status-text"></div>
+        </div>
+      </section>
+
+      <section>
+        <div class="card-header">
+          <div>
+            <h3 id="bulk-title">批量导入</h3>
+            <p class="helper" id="bulk-helper">每行一个日期，格式：日期, 成交额, 订单量, 线索量, 成交客户数</p>
+          </div>
+        </div>
+        <div class="field-grid" style="margin-top: 14px;">
+          <label>
+            <span id="label-bulk">CSV 粘贴区</span>
+            <textarea id="bulk-input" placeholder="2026-05-01, 86000, 9, 31, 6&#10;2026-05-02, 92000, 10, 35, 7"></textarea>
+          </label>
+          <div class="button-row">
+            <button class="button-secondary" id="import-records">导入到面板</button>
+            <button class="button-danger" id="clear-records">清空全部数据</button>
+          </div>
+          <p class="helper" id="bulk-tip">点击下方数据表中的任意日期，也可以把那一行回填到录入区继续修改。</p>
+        </div>
+      </section>
+    </aside>
+
+    <main class="main">
+      <section class="panel hero">
+        <div class="hero-copy">
+          <span class="eyebrow" id="hero-eyebrow">Dealism Revenue Analytics</span>
+          <h2 id="hero-title">把成交额、订单量与线索效率放在同一个决策面板里。</h2>
+          <p id="hero-desc">页面默认会以最近 7 条数据作为当前周期，与上一周期进行对比。趋势图支持切换不同指标，也可以查看累计走势，更接近你给的分析台视觉节奏。</p>
+        </div>
+        <div class="chip-group">
+          <div class="chip" id="chip-range">当前周期: --</div>
+          <div class="chip" id="chip-period">对比周期: --</div>
+        </div>
+      </section>
+
+      <section class="metrics">
+        <article class="panel metric-card">
+          <div class="metric-title" id="metric-revenue-title">累计成交额</div>
+          <div class="metric-value" id="metric-revenue">¥0</div>
+          <div class="metric-footnote" id="metric-revenue-note">最近 7 天对比上周期 --</div>
+        </article>
+        <article class="panel metric-card">
+          <div class="metric-title" id="metric-orders-title">累计订单量</div>
+          <div class="metric-value" id="metric-orders">0</div>
+          <div class="metric-footnote" id="metric-orders-note">订单转化效率 --</div>
+        </article>
+        <article class="panel metric-card">
+          <div class="metric-title" id="metric-leads-title">累计线索量</div>
+          <div class="metric-value" id="metric-leads">0</div>
+          <div class="metric-footnote" id="metric-leads-note">线索储备质量 --</div>
+        </article>
+        <article class="panel metric-card">
+          <div class="metric-title" id="metric-customers-title">成交客户数</div>
+          <div class="metric-value" id="metric-customers">0</div>
+          <div class="metric-footnote" id="metric-customers-note">客户成交率 --</div>
+        </article>
+      </section>
+
+      <section class="panel chart-card">
+        <div class="card-header">
+          <div>
+            <h3 id="chart-title">趋势图</h3>
+            <p id="chart-helper">支持按指标切换，并在日趋势与累计趋势之间查看变化。</p>
+          </div>
+          <div class="header-actions">
+            <select id="metric-select" aria-label="选择指标">
+              <option id="option-metric-revenue" value="revenue">成交额</option>
+              <option id="option-metric-orders" value="orders">订单量</option>
+              <option id="option-metric-leads" value="leads">线索量</option>
+              <option id="option-metric-customers" value="customers">成交客户数</option>
+            </select>
+            <div class="segmented" role="tablist" aria-label="趋势模式">
+              <button class="active" id="mode-daily" data-mode="daily">日趋势</button>
+              <button id="mode-cumulative" data-mode="cumulative">累计趋势</button>
+            </div>
+          </div>
+        </div>
+        <div class="chart-wrap">
+          <svg id="trend-chart" viewBox="0 0 960 380" preserveAspectRatio="none" aria-label="趋势图"></svg>
+        </div>
+        <div class="legend">
+          <span><i style="background: var(--blue);"></i><span id="legend-current">当前数据走势</span></span>
+          <span><i style="background: var(--green);"></i><span id="legend-area">面积辅助层</span></span>
+          <span><i style="background: var(--amber);"></i><span id="legend-previous">当前周期对比上一周期</span></span>
+        </div>
+      </section>
+
+      <section class="split">
+        <section class="panel table-card">
+          <div class="card-header">
+            <div>
+              <h3 id="performance-title">周期表现</h3>
+              <p id="performance-helper">默认比较最近 7 条数据与前 7 条数据，变化率自动计算。</p>
+            </div>
+          </div>
+          <div style="margin-top: 18px;">
+            <table>
+              <thead>
+                <tr>
+                  <th id="performance-header-metric">指标</th>
+                  <th id="current-period-label">当前周期</th>
+                  <th id="previous-period-label">上一周期</th>
+                  <th id="performance-header-change">变化</th>
+                </tr>
+              </thead>
+              <tbody id="performance-body"></tbody>
+            </table>
+          </div>
+        </section>
+
+        <section class="panel funnel-card">
+          <div class="card-header">
+            <div>
+              <h3 id="funnel-title">转化漏斗</h3>
+              <p id="funnel-helper">从线索到订单，再到成交客户，观察每一段转化流失。</p>
+            </div>
+          </div>
+          <div class="funnel-grid" id="funnel-grid"></div>
+          <div class="funnel-notes" id="funnel-notes"></div>
+        </section>
+      </section>
+
+      <section class="panel records-card">
+        <div class="card-header">
+          <div>
+            <h3 id="records-title">原始数据明细</h3>
+            <p id="records-helper">点击任意一行即可回填到左侧表单，便于修改。</p>
+          </div>
+          <div class="muted" id="record-count">0 条记录</div>
+        </div>
+        <div class="records-scroll">
+          <table>
+            <thead>
+              <tr>
+                <th id="records-header-date">日期</th>
+                <th id="records-header-revenue">成交额</th>
+                <th id="records-header-orders">订单量</th>
+                <th id="records-header-leads">线索量</th>
+                <th id="records-header-customers">成交客户数</th>
+                <th id="records-header-l2o">线索→订单</th>
+                <th id="records-header-o2c">订单→客户</th>
+              </tr>
+            </thead>
+            <tbody id="records-body"></tbody>
+          </table>
+          <div class="empty-state" id="empty-state" hidden>还没有数据，先在左侧录入一条，或者点击“载入示例”。</div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <script>
+    const STORAGE_KEY = "dealism-dashboard-records";
+    const LANGUAGE_KEY = "dealism-dashboard-language";
+    const THEME_KEY = "dealism-dashboard-theme";
+    const sampleRecords = [
+      { date: "2026-04-26", revenue: 68000, orders: 8, leads: 24, customers: 5 },
+      { date: "2026-04-27", revenue: 74000, orders: 8, leads: 29, customers: 5 },
+      { date: "2026-04-28", revenue: 79000, orders: 9, leads: 31, customers: 6 },
+      { date: "2026-04-29", revenue: 86000, orders: 10, leads: 33, customers: 6 },
+      { date: "2026-04-30", revenue: 91500, orders: 11, leads: 34, customers: 7 },
+      { date: "2026-05-01", revenue: 96500, orders: 11, leads: 37, customers: 7 },
+      { date: "2026-05-02", revenue: 101000, orders: 12, leads: 39, customers: 8 },
+      { date: "2026-05-03", revenue: 99000, orders: 10, leads: 36, customers: 7 },
+      { date: "2026-05-04", revenue: 108000, orders: 12, leads: 40, customers: 8 },
+      { date: "2026-05-05", revenue: 116000, orders: 13, leads: 43, customers: 9 },
+      { date: "2026-05-06", revenue: 121000, orders: 14, leads: 46, customers: 9 },
+      { date: "2026-05-07", revenue: 132000, orders: 15, leads: 49, customers: 10 },
+      { date: "2026-05-08", revenue: 139000, orders: 16, leads: 53, customers: 11 },
+      { date: "2026-05-09", revenue: 147000, orders: 17, leads: 58, customers: 12 }
+    ];
+
+    const translations = {
+      zh: {
+        htmlLang: "zh-CN",
+        locale: "zh-CN",
+        currency: "USD",
+        appTitle: "Dealism Dashboard",
+        languageLabel: "界面语言",
+        themeLabel: "界面主题",
+        themeDark: "深色模式",
+        themeLight: "浅色模式",
+        sidebarEyebrow: "Dealism Performance",
+        sidebarTitle: "成交分析台",
+        sidebarLede: "录入每天的成交额、订单、线索和成交客户数，页面会自动生成趋势图、核心指标和转化分析。所有数据只保存在当前浏览器。",
+        dailyTitle: "单日录入",
+        dailyHelper: "同一天重复保存会自动覆盖更新。",
+        labelDate: "日期",
+        labelRevenue: "成交额",
+        labelOrders: "订单量",
+        labelLeads: "线索量",
+        labelCustomers: "成交客户数",
+        placeholderRevenue: "例如 128000",
+        placeholderOrders: "例如 14",
+        placeholderLeads: "例如 52",
+        placeholderCustomers: "例如 9",
+        saveRecord: "保存数据",
+        prefillSample: "载入示例",
+        bulkTitle: "批量导入",
+        bulkHelper: "每行一个日期，格式：日期, 成交额, 订单量, 线索量, 成交客户数",
+        labelBulk: "CSV 粘贴区",
+        bulkPlaceholder: "2026-05-01, 86000, 9, 31, 6\n2026-05-02, 92000, 10, 35, 7",
+        importRecords: "导入到面板",
+        clearRecords: "清空全部数据",
+        bulkTip: "点击下方数据表中的任意日期，也可以把那一行回填到录入区继续修改。",
+        heroEyebrow: "Dealism Revenue Analytics",
+        heroTitle: "把成交额、订单量与线索效率放在同一个决策面板里。",
+        heroDesc: "页面默认会以最近 7 条数据作为当前周期，与上一周期进行对比。趋势图支持切换不同指标，也可以查看累计走势，更接近你给的分析台视觉节奏。",
+        periodCurrent: "当前周期: {start} - {end}",
+        periodCurrentEmpty: "当前周期: --",
+        periodPrevious: "对比周期: {start} - {end}",
+        periodPreviousEmpty: "对比周期: 暂无",
+        totalRevenue: "累计成交额",
+        totalOrders: "累计订单量",
+        totalLeads: "累计线索量",
+        totalCustomers: "成交客户数",
+        chartTitle: "趋势图",
+        chartHelper: "支持按指标切换，并在日趋势与累计趋势之间查看变化。",
+        chartAria: "趋势图",
+        metricSelectAria: "选择指标",
+        modeAria: "趋势模式",
+        optionRevenue: "成交额",
+        optionOrders: "订单量",
+        optionLeads: "线索量",
+        optionCustomers: "成交客户数",
+        modeDaily: "日趋势",
+        modeCumulative: "累计趋势",
+        legendCurrent: "当前数据走势",
+        legendArea: "面积辅助层",
+        legendPrevious: "当前周期对比上一周期",
+        performanceTitle: "周期表现",
+        performanceHelper: "默认比较最近 7 条数据与前 7 条数据，变化率自动计算。",
+        performanceHeaderMetric: "指标",
+        performanceHeaderCurrent: "当前 ({start} - {end})",
+        performanceHeaderCurrentEmpty: "当前",
+        performanceHeaderPrevious: "上一期 ({start} - {end})",
+        performanceHeaderPreviousEmpty: "上一期",
+        performanceHeaderChange: "变化",
+        funnelTitle: "转化漏斗",
+        funnelHelper: "从线索到订单，再到成交客户，观察每一段转化流失。",
+        recordsTitle: "原始数据明细",
+        recordsHelper: "点击任意一行即可回填到左侧表单，便于修改。",
+        recordsCount: "{count} 条记录",
+        recordsHeaderDate: "日期",
+        recordsHeaderRevenue: "成交额",
+        recordsHeaderOrders: "订单量",
+        recordsHeaderLeads: "线索量",
+        recordsHeaderCustomers: "成交客户数",
+        recordsHeaderL2O: "线索→订单",
+        recordsHeaderO2C: "订单→客户",
+        emptyState: "还没有数据，先在左侧录入一条，或者点击“载入示例”。",
+        metricRevenueNote: "最近 7 条数据对比 {change}",
+        metricOrdersNote: "当前周期线索转单率 {rate}",
+        metricLeadsNote: "当前周期日均线索 {value}",
+        metricLeadsNoteEmpty: "线索储备质量 --",
+        metricCustomersNote: "当前周期订单成客率 {rate}",
+        tableRevenue: "成交额",
+        tableOrders: "订单量",
+        tableLeads: "线索量",
+        tableCustomers: "成交客户数",
+        tableLeadToOrder: "线索→订单",
+        tableOrderToCustomer: "订单→客户",
+        tableRevenuePerOrder: "客单价",
+        funnelLeads: "线索量",
+        funnelOrders: "订单量",
+        funnelCustomers: "成交客户数",
+        funnelLeadToOrder: "线索到订单转化",
+        funnelOrderToCustomer: "订单到客户转化",
+        funnelLeadToCustomer: "线索到客户总转化",
+        funnelRevenuePerCustomer: "单个成交客户产出",
+        chartNoData: "暂无可视化数据",
+        chartLabelDaily: "{metric}日趋势",
+        chartLabelCumulative: "{metric}累计趋势",
+        statusAutoSample: "已自动载入示例数据，你可以直接开始替换。",
+        statusLoadedExisting: "已读取你之前保存的数据。",
+        statusSelectDate: "请先选择日期。",
+        statusUpdated: "该日期数据已更新。",
+        statusSaved: "新数据已保存。",
+        statusSampleLoaded: "示例数据已载入。",
+        statusPasteCsv: "请先粘贴要导入的 CSV 数据。",
+        statusInvalidImport: "没有识别到可导入的数据格式。",
+        statusImported: "已导入 {count} 条数据。",
+        statusCleared: "全部数据已清空。",
+        statusPrefilled: "已回填 {date} 的数据，可以直接修改后保存。",
+        confirmClear: "确定要清空全部数据吗？此操作只会清空当前浏览器里保存的数据。",
+        changeNoPrevious: "暂无可比上一周期",
+        changeFlat: "与上一周期持平",
+        changeUp: "上涨 {value}",
+        changeDown: "下降 {value}",
+        deltaNewPeriod: "新增周期",
+        commonNa: "--"
+      },
+      en: {
+        htmlLang: "en",
+        locale: "en-US",
+        currency: "USD",
+        appTitle: "Dealism Dashboard",
+        languageLabel: "Language",
+        themeLabel: "Theme",
+        themeDark: "Dark Mode",
+        themeLight: "Light Mode",
+        sidebarEyebrow: "Dealism Performance",
+        sidebarTitle: "Revenue Dashboard",
+        sidebarLede: "Enter daily revenue, orders, leads, and closed customers. The page automatically builds trend charts, KPI cards, and conversion analysis. All data stays in this browser only.",
+        dailyTitle: "Daily Entry",
+        dailyHelper: "Saving the same date again will overwrite that record.",
+        labelDate: "Date",
+        labelRevenue: "Revenue",
+        labelOrders: "Orders",
+        labelLeads: "Leads",
+        labelCustomers: "Closed Customers",
+        placeholderRevenue: "e.g. 128000",
+        placeholderOrders: "e.g. 14",
+        placeholderLeads: "e.g. 52",
+        placeholderCustomers: "e.g. 9",
+        saveRecord: "Save Record",
+        prefillSample: "Load Sample",
+        bulkTitle: "Bulk Import",
+        bulkHelper: "One record per line: date, revenue, orders, leads, closed customers",
+        labelBulk: "CSV Paste Area",
+        bulkPlaceholder: "2026-05-01, 86000, 9, 31, 6\n2026-05-02, 92000, 10, 35, 7",
+        importRecords: "Import to Dashboard",
+        clearRecords: "Clear All Data",
+        bulkTip: "Click any row in the table below to refill the form for quick editing.",
+        heroEyebrow: "Dealism Revenue Analytics",
+        heroTitle: "Keep revenue, order volume, and lead efficiency in one decision dashboard.",
+        heroDesc: "The dashboard compares the latest 7 records with the previous 7 by default. You can switch chart metrics and view both daily and cumulative trends.",
+        periodCurrent: "Current period: {start} - {end}",
+        periodCurrentEmpty: "Current period: --",
+        periodPrevious: "Previous period: {start} - {end}",
+        periodPreviousEmpty: "Previous period: none",
+        totalRevenue: "Total Revenue",
+        totalOrders: "Total Orders",
+        totalLeads: "Total Leads",
+        totalCustomers: "Closed Customers",
+        chartTitle: "Trend Chart",
+        chartHelper: "Switch metrics and compare daily versus cumulative movement.",
+        chartAria: "Trend chart",
+        metricSelectAria: "Select metric",
+        modeAria: "Trend mode",
+        optionRevenue: "Revenue",
+        optionOrders: "Orders",
+        optionLeads: "Leads",
+        optionCustomers: "Closed Customers",
+        modeDaily: "Daily",
+        modeCumulative: "Cumulative",
+        legendCurrent: "Current trend",
+        legendArea: "Area layer",
+        legendPrevious: "Current period vs previous",
+        performanceTitle: "Period Performance",
+        performanceHelper: "Compares the latest 7 records with the previous 7 automatically.",
+        performanceHeaderMetric: "Metric",
+        performanceHeaderCurrent: "Current ({start} - {end})",
+        performanceHeaderCurrentEmpty: "Current",
+        performanceHeaderPrevious: "Previous ({start} - {end})",
+        performanceHeaderPreviousEmpty: "Previous",
+        performanceHeaderChange: "Change",
+        funnelTitle: "Conversion Funnel",
+        funnelHelper: "Track drop-off from leads to orders to closed customers.",
+        recordsTitle: "Raw Records",
+        recordsHelper: "Click any row to refill the form on the left for editing.",
+        recordsCount: "{count} records",
+        recordsHeaderDate: "Date",
+        recordsHeaderRevenue: "Revenue",
+        recordsHeaderOrders: "Orders",
+        recordsHeaderLeads: "Leads",
+        recordsHeaderCustomers: "Closed Customers",
+        recordsHeaderL2O: "Lead → Order",
+        recordsHeaderO2C: "Order → Customer",
+        emptyState: "No data yet. Add one record on the left or load the sample set.",
+        metricRevenueNote: "Latest 7 records vs previous period: {change}",
+        metricOrdersNote: "Lead-to-order rate this period: {rate}",
+        metricLeadsNote: "Average leads per day this period: {value}",
+        metricLeadsNoteEmpty: "Lead quality --",
+        metricCustomersNote: "Order-to-customer rate this period: {rate}",
+        tableRevenue: "Revenue",
+        tableOrders: "Orders",
+        tableLeads: "Leads",
+        tableCustomers: "Closed Customers",
+        tableLeadToOrder: "Lead → Order",
+        tableOrderToCustomer: "Order → Customer",
+        tableRevenuePerOrder: "Revenue / Order",
+        funnelLeads: "Leads",
+        funnelOrders: "Orders",
+        funnelCustomers: "Closed Customers",
+        funnelLeadToOrder: "Lead to order conversion",
+        funnelOrderToCustomer: "Order to customer conversion",
+        funnelLeadToCustomer: "Lead to customer conversion",
+        funnelRevenuePerCustomer: "Revenue per closed customer",
+        chartNoData: "No data to visualize",
+        chartLabelDaily: "{metric} daily trend",
+        chartLabelCumulative: "{metric} cumulative trend",
+        statusAutoSample: "Sample data was loaded automatically so you can start replacing it.",
+        statusLoadedExisting: "Loaded the data saved in your browser.",
+        statusSelectDate: "Please choose a date first.",
+        statusUpdated: "That date has been updated.",
+        statusSaved: "New record saved.",
+        statusSampleLoaded: "Sample data loaded.",
+        statusPasteCsv: "Paste CSV data before importing.",
+        statusInvalidImport: "No valid import rows were recognized.",
+        statusImported: "{count} record(s) imported.",
+        statusCleared: "All data has been cleared.",
+        statusPrefilled: "Filled the form with data from {date}. You can edit and save it now.",
+        confirmClear: "Clear all data? This only removes records saved in this browser.",
+        changeNoPrevious: "no comparable previous period",
+        changeFlat: "flat vs previous period",
+        changeUp: "up {value}",
+        changeDown: "down {value}",
+        deltaNewPeriod: "new period",
+        commonNa: "--"
+      },
+      "pt-BR": {
+        htmlLang: "pt-BR",
+        locale: "pt-BR",
+        currency: "BRL",
+        appTitle: "Dealism Dashboard",
+        languageLabel: "Idioma",
+        themeLabel: "Tema",
+        themeDark: "Modo Escuro",
+        themeLight: "Modo Claro",
+        sidebarEyebrow: "Dealism Performance",
+        sidebarTitle: "Painel de Receita",
+        sidebarLede: "Insira receita diária, pedidos, leads e clientes fechados. A página gera automaticamente gráficos de tendência, KPIs e análise de conversão. Todos os dados ficam apenas neste navegador.",
+        dailyTitle: "Lançamento Diário",
+        dailyHelper: "Salvar a mesma data novamente substitui o registro existente.",
+        labelDate: "Data",
+        labelRevenue: "Receita",
+        labelOrders: "Pedidos",
+        labelLeads: "Leads",
+        labelCustomers: "Clientes Fechados",
+        placeholderRevenue: "ex.: 128000",
+        placeholderOrders: "ex.: 14",
+        placeholderLeads: "ex.: 52",
+        placeholderCustomers: "ex.: 9",
+        saveRecord: "Salvar Registro",
+        prefillSample: "Carregar Exemplo",
+        bulkTitle: "Importação em Lote",
+        bulkHelper: "Uma linha por registro: data, receita, pedidos, leads, clientes fechados",
+        labelBulk: "Área para Colar CSV",
+        bulkPlaceholder: "2026-05-01, 86000, 9, 31, 6\n2026-05-02, 92000, 10, 35, 7",
+        importRecords: "Importar para o Painel",
+        clearRecords: "Limpar Todos os Dados",
+        bulkTip: "Clique em qualquer linha da tabela abaixo para preencher o formulário e editar rapidamente.",
+        heroEyebrow: "Dealism Revenue Analytics",
+        heroTitle: "Mantenha receita, volume de pedidos e eficiência de leads no mesmo painel de decisão.",
+        heroDesc: "O painel compara, por padrão, os 7 registros mais recentes com os 7 anteriores. Você pode trocar a métrica do gráfico e ver tendências diárias ou acumuladas.",
+        periodCurrent: "Período atual: {start} - {end}",
+        periodCurrentEmpty: "Período atual: --",
+        periodPrevious: "Período anterior: {start} - {end}",
+        periodPreviousEmpty: "Período anterior: nenhum",
+        totalRevenue: "Receita Total",
+        totalOrders: "Total de Pedidos",
+        totalLeads: "Total de Leads",
+        totalCustomers: "Clientes Fechados",
+        chartTitle: "Gráfico de Tendência",
+        chartHelper: "Troque a métrica e compare movimento diário versus acumulado.",
+        chartAria: "Gráfico de tendência",
+        metricSelectAria: "Selecionar métrica",
+        modeAria: "Modo de tendência",
+        optionRevenue: "Receita",
+        optionOrders: "Pedidos",
+        optionLeads: "Leads",
+        optionCustomers: "Clientes Fechados",
+        modeDaily: "Diário",
+        modeCumulative: "Acumulado",
+        legendCurrent: "Tendência atual",
+        legendArea: "Camada de área",
+        legendPrevious: "Período atual vs anterior",
+        performanceTitle: "Desempenho do Período",
+        performanceHelper: "Compara automaticamente os 7 registros mais recentes com os 7 anteriores.",
+        performanceHeaderMetric: "Métrica",
+        performanceHeaderCurrent: "Atual ({start} - {end})",
+        performanceHeaderCurrentEmpty: "Atual",
+        performanceHeaderPrevious: "Anterior ({start} - {end})",
+        performanceHeaderPreviousEmpty: "Anterior",
+        performanceHeaderChange: "Variação",
+        funnelTitle: "Funil de Conversão",
+        funnelHelper: "Acompanhe a perda entre leads, pedidos e clientes fechados.",
+        recordsTitle: "Registros Brutos",
+        recordsHelper: "Clique em qualquer linha para preencher o formulário à esquerda e editar.",
+        recordsCount: "{count} registros",
+        recordsHeaderDate: "Data",
+        recordsHeaderRevenue: "Receita",
+        recordsHeaderOrders: "Pedidos",
+        recordsHeaderLeads: "Leads",
+        recordsHeaderCustomers: "Clientes Fechados",
+        recordsHeaderL2O: "Lead → Pedido",
+        recordsHeaderO2C: "Pedido → Cliente",
+        emptyState: "Ainda não há dados. Adicione um registro à esquerda ou carregue o exemplo.",
+        metricRevenueNote: "Últimos 7 registros vs período anterior: {change}",
+        metricOrdersNote: "Taxa lead→pedido neste período: {rate}",
+        metricLeadsNote: "Média diária de leads neste período: {value}",
+        metricLeadsNoteEmpty: "Qualidade de leads --",
+        metricCustomersNote: "Taxa pedido→cliente neste período: {rate}",
+        tableRevenue: "Receita",
+        tableOrders: "Pedidos",
+        tableLeads: "Leads",
+        tableCustomers: "Clientes Fechados",
+        tableLeadToOrder: "Lead → Pedido",
+        tableOrderToCustomer: "Pedido → Cliente",
+        tableRevenuePerOrder: "Receita / Pedido",
+        funnelLeads: "Leads",
+        funnelOrders: "Pedidos",
+        funnelCustomers: "Clientes Fechados",
+        funnelLeadToOrder: "Conversão de lead para pedido",
+        funnelOrderToCustomer: "Conversão de pedido para cliente",
+        funnelLeadToCustomer: "Conversão total de lead para cliente",
+        funnelRevenuePerCustomer: "Receita por cliente fechado",
+        chartNoData: "Sem dados para visualizar",
+        chartLabelDaily: "Tendência diária de {metric}",
+        chartLabelCumulative: "Tendência acumulada de {metric}",
+        statusAutoSample: "Os dados de exemplo foram carregados automaticamente para você começar a substituir.",
+        statusLoadedExisting: "Dados salvos neste navegador foram carregados.",
+        statusSelectDate: "Escolha uma data primeiro.",
+        statusUpdated: "Essa data foi atualizada.",
+        statusSaved: "Novo registro salvo.",
+        statusSampleLoaded: "Dados de exemplo carregados.",
+        statusPasteCsv: "Cole os dados CSV antes de importar.",
+        statusInvalidImport: "Nenhuma linha válida foi reconhecida para importação.",
+        statusImported: "{count} registro(s) importado(s).",
+        statusCleared: "Todos os dados foram apagados.",
+        statusPrefilled: "O formulário foi preenchido com os dados de {date}. Agora você pode editar e salvar.",
+        confirmClear: "Limpar todos os dados? Isso remove apenas os registros salvos neste navegador.",
+        changeNoPrevious: "sem período anterior comparável",
+        changeFlat: "estável em relação ao período anterior",
+        changeUp: "alta de {value}",
+        changeDown: "queda de {value}",
+        deltaNewPeriod: "novo período",
+        commonNa: "--"
+      },
+      es: {
+        htmlLang: "es",
+        locale: "es-ES",
+        currency: "USD",
+        appTitle: "Dealism Dashboard",
+        languageLabel: "Idioma",
+        themeLabel: "Tema",
+        themeDark: "Modo Oscuro",
+        themeLight: "Modo Claro",
+        sidebarEyebrow: "Dealism Performance",
+        sidebarTitle: "Panel de Ingresos",
+        sidebarLede: "Ingresa ingresos diarios, pedidos, leads y clientes cerrados. La página genera automáticamente gráficos de tendencia, KPI y análisis de conversión. Todos los datos se guardan solo en este navegador.",
+        dailyTitle: "Carga Diaria",
+        dailyHelper: "Guardar la misma fecha otra vez sobrescribe ese registro.",
+        labelDate: "Fecha",
+        labelRevenue: "Ingresos",
+        labelOrders: "Pedidos",
+        labelLeads: "Leads",
+        labelCustomers: "Clientes Cerrados",
+        placeholderRevenue: "p. ej. 128000",
+        placeholderOrders: "p. ej. 14",
+        placeholderLeads: "p. ej. 52",
+        placeholderCustomers: "p. ej. 9",
+        saveRecord: "Guardar Registro",
+        prefillSample: "Cargar Ejemplo",
+        bulkTitle: "Importación Masiva",
+        bulkHelper: "Una línea por registro: fecha, ingresos, pedidos, leads, clientes cerrados",
+        labelBulk: "Área para Pegar CSV",
+        bulkPlaceholder: "2026-05-01, 86000, 9, 31, 6\n2026-05-02, 92000, 10, 35, 7",
+        importRecords: "Importar al Panel",
+        clearRecords: "Borrar Todos los Datos",
+        bulkTip: "Haz clic en cualquier fila de la tabla para rellenar el formulario y editarla rápidamente.",
+        heroEyebrow: "Dealism Revenue Analytics",
+        heroTitle: "Mantén ingresos, volumen de pedidos y eficiencia de leads en un solo panel de decisión.",
+        heroDesc: "El panel compara por defecto los 7 registros más recientes con los 7 anteriores. Puedes cambiar la métrica del gráfico y ver tendencias diarias o acumuladas.",
+        periodCurrent: "Periodo actual: {start} - {end}",
+        periodCurrentEmpty: "Periodo actual: --",
+        periodPrevious: "Periodo anterior: {start} - {end}",
+        periodPreviousEmpty: "Periodo anterior: ninguno",
+        totalRevenue: "Ingresos Totales",
+        totalOrders: "Pedidos Totales",
+        totalLeads: "Leads Totales",
+        totalCustomers: "Clientes Cerrados",
+        chartTitle: "Gráfico de Tendencia",
+        chartHelper: "Cambia la métrica y compara movimiento diario frente a acumulado.",
+        chartAria: "Gráfico de tendencia",
+        metricSelectAria: "Seleccionar métrica",
+        modeAria: "Modo de tendencia",
+        optionRevenue: "Ingresos",
+        optionOrders: "Pedidos",
+        optionLeads: "Leads",
+        optionCustomers: "Clientes Cerrados",
+        modeDaily: "Diario",
+        modeCumulative: "Acumulado",
+        legendCurrent: "Tendencia actual",
+        legendArea: "Capa de área",
+        legendPrevious: "Periodo actual vs anterior",
+        performanceTitle: "Rendimiento del Periodo",
+        performanceHelper: "Compara automáticamente los 7 registros más recientes con los 7 anteriores.",
+        performanceHeaderMetric: "Métrica",
+        performanceHeaderCurrent: "Actual ({start} - {end})",
+        performanceHeaderCurrentEmpty: "Actual",
+        performanceHeaderPrevious: "Anterior ({start} - {end})",
+        performanceHeaderPreviousEmpty: "Anterior",
+        performanceHeaderChange: "Cambio",
+        funnelTitle: "Embudo de Conversión",
+        funnelHelper: "Observa la pérdida desde leads hasta pedidos y clientes cerrados.",
+        recordsTitle: "Registros Originales",
+        recordsHelper: "Haz clic en cualquier fila para rellenar el formulario de la izquierda y editar.",
+        recordsCount: "{count} registros",
+        recordsHeaderDate: "Fecha",
+        recordsHeaderRevenue: "Ingresos",
+        recordsHeaderOrders: "Pedidos",
+        recordsHeaderLeads: "Leads",
+        recordsHeaderCustomers: "Clientes Cerrados",
+        recordsHeaderL2O: "Lead → Pedido",
+        recordsHeaderO2C: "Pedido → Cliente",
+        emptyState: "Todavía no hay datos. Agrega un registro a la izquierda o carga el ejemplo.",
+        metricRevenueNote: "Últimos 7 registros vs periodo anterior: {change}",
+        metricOrdersNote: "Tasa lead→pedido en este periodo: {rate}",
+        metricLeadsNote: "Promedio diario de leads en este periodo: {value}",
+        metricLeadsNoteEmpty: "Calidad de leads --",
+        metricCustomersNote: "Tasa pedido→cliente en este periodo: {rate}",
+        tableRevenue: "Ingresos",
+        tableOrders: "Pedidos",
+        tableLeads: "Leads",
+        tableCustomers: "Clientes Cerrados",
+        tableLeadToOrder: "Lead → Pedido",
+        tableOrderToCustomer: "Pedido → Cliente",
+        tableRevenuePerOrder: "Ingresos / Pedido",
+        funnelLeads: "Leads",
+        funnelOrders: "Pedidos",
+        funnelCustomers: "Clientes Cerrados",
+        funnelLeadToOrder: "Conversión de lead a pedido",
+        funnelOrderToCustomer: "Conversión de pedido a cliente",
+        funnelLeadToCustomer: "Conversión total de lead a cliente",
+        funnelRevenuePerCustomer: "Ingresos por cliente cerrado",
+        chartNoData: "No hay datos para visualizar",
+        chartLabelDaily: "Tendencia diaria de {metric}",
+        chartLabelCumulative: "Tendencia acumulada de {metric}",
+        statusAutoSample: "Los datos de ejemplo se cargaron automáticamente para que empieces a reemplazarlos.",
+        statusLoadedExisting: "Se cargaron los datos guardados en este navegador.",
+        statusSelectDate: "Primero selecciona una fecha.",
+        statusUpdated: "Esa fecha se actualizó.",
+        statusSaved: "Nuevo registro guardado.",
+        statusSampleLoaded: "Datos de ejemplo cargados.",
+        statusPasteCsv: "Pega los datos CSV antes de importar.",
+        statusInvalidImport: "No se reconocieron filas válidas para importar.",
+        statusImported: "Se importó/importaron {count} registro(s).",
+        statusCleared: "Todos los datos se borraron.",
+        statusPrefilled: "El formulario se rellenó con los datos de {date}. Ahora puedes editar y guardar.",
+        confirmClear: "¿Borrar todos los datos? Esto solo elimina los registros guardados en este navegador.",
+        changeNoPrevious: "sin periodo anterior comparable",
+        changeFlat: "sin cambios frente al periodo anterior",
+        changeUp: "sube {value}",
+        changeDown: "baja {value}",
+        deltaNewPeriod: "periodo nuevo",
+        commonNa: "--"
+      }
+    };
+
+    const state = {
+      records: loadRecords(),
+      metric: "revenue",
+      mode: "daily",
+      language: loadLanguage(),
+      theme: loadTheme(),
+      statusInfo: null
+    };
+
+    const elements = {
+      languageSelect: document.getElementById("language-select"),
+      themeSelect: document.getElementById("theme-select"),
+      inputDate: document.getElementById("input-date"),
+      inputRevenue: document.getElementById("input-revenue"),
+      inputOrders: document.getElementById("input-orders"),
+      inputLeads: document.getElementById("input-leads"),
+      inputCustomers: document.getElementById("input-customers"),
+      bulkInput: document.getElementById("bulk-input"),
+      statusText: document.getElementById("status-text"),
+      metricSelect: document.getElementById("metric-select"),
+      chart: document.getElementById("trend-chart"),
+      performanceBody: document.getElementById("performance-body"),
+      funnelGrid: document.getElementById("funnel-grid"),
+      funnelNotes: document.getElementById("funnel-notes"),
+      recordsBody: document.getElementById("records-body"),
+      emptyState: document.getElementById("empty-state"),
+      recordCount: document.getElementById("record-count"),
+      currentPeriodLabel: document.getElementById("current-period-label"),
+      previousPeriodLabel: document.getElementById("previous-period-label"),
+      chipRange: document.getElementById("chip-range"),
+      chipPeriod: document.getElementById("chip-period"),
+      metricRevenue: document.getElementById("metric-revenue"),
+      metricRevenueNote: document.getElementById("metric-revenue-note"),
+      metricOrders: document.getElementById("metric-orders"),
+      metricOrdersNote: document.getElementById("metric-orders-note"),
+      metricLeads: document.getElementById("metric-leads"),
+      metricLeadsNote: document.getElementById("metric-leads-note"),
+      metricCustomers: document.getElementById("metric-customers"),
+      metricCustomersNote: document.getElementById("metric-customers-note")
+    };
+
+    document.getElementById("save-record").addEventListener("click", saveRecordFromForm);
+    document.getElementById("prefill-sample").addEventListener("click", loadSampleData);
+    document.getElementById("import-records").addEventListener("click", importBulkData);
+    document.getElementById("clear-records").addEventListener("click", clearAllRecords);
+    document.getElementById("mode-daily").addEventListener("click", () => setMode("daily"));
+    document.getElementById("mode-cumulative").addEventListener("click", () => setMode("cumulative"));
+    elements.languageSelect.addEventListener("change", (event) => {
+      state.language = event.target.value;
+      persistLanguage();
+      applyLanguage();
+      renderDashboard();
+    });
+    elements.themeSelect.addEventListener("change", (event) => {
+      state.theme = event.target.value;
+      persistTheme();
+      applyTheme();
+    });
+    elements.metricSelect.addEventListener("change", (event) => {
+      state.metric = event.target.value;
+      renderDashboard();
+    });
+    elements.recordsBody.addEventListener("click", handleRecordRowClick);
+
+    elements.languageSelect.value = state.language;
+    elements.themeSelect.value = state.theme;
+    applyTheme();
+    applyLanguage();
+
+    if (!state.records.length) {
+      state.records = normalizeRecords(sampleRecords);
+      persistRecords();
+      setStatus("statusAutoSample");
+    } else {
+      setStatus("statusLoadedExisting");
+    }
+
+    elements.inputDate.value = todayString();
+    renderDashboard();
+
+    function loadRecords() {
+      try {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if (!raw) {
+          return [];
+        }
+        const parsed = JSON.parse(raw);
+        return normalizeRecords(parsed);
+      } catch (error) {
+        return [];
+      }
+    }
+
+    function persistRecords() {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(state.records));
+    }
+
+    function loadLanguage() {
+      const value = localStorage.getItem(LANGUAGE_KEY);
+      return translations[value] ? value : "zh";
+    }
+
+    function persistLanguage() {
+      localStorage.setItem(LANGUAGE_KEY, state.language);
+    }
+
+    function loadTheme() {
+      const value = localStorage.getItem(THEME_KEY);
+      return value === "light" ? "light" : "dark";
+    }
+
+    function persistTheme() {
+      localStorage.setItem(THEME_KEY, state.theme);
+    }
+
+    function currentMessages() {
+      return translations[state.language] || translations.zh;
+    }
+
+    function currentLocale() {
+      return currentMessages().locale;
+    }
+
+    function currentCurrency() {
+      return currentMessages().currency || "USD";
+    }
+
+    function t(key, vars = {}) {
+      const message = currentMessages()[key] ?? translations.zh[key] ?? key;
+      return message.replace(/\{(\w+)\}/g, (_, token) => vars[token] ?? "");
+    }
+
+    function applyLanguage() {
+      document.documentElement.lang = currentMessages().htmlLang;
+      document.title = t("appTitle");
+      document.getElementById("language-label").textContent = t("languageLabel");
+      document.getElementById("theme-label").textContent = t("themeLabel");
+      document.querySelector('#theme-select option[value="dark"]').textContent = t("themeDark");
+      document.querySelector('#theme-select option[value="light"]').textContent = t("themeLight");
+      document.getElementById("sidebar-eyebrow").textContent = t("sidebarEyebrow");
+      document.getElementById("sidebar-title").textContent = t("sidebarTitle");
+      document.getElementById("sidebar-lede").textContent = t("sidebarLede");
+      document.getElementById("daily-title").textContent = t("dailyTitle");
+      document.getElementById("daily-helper").textContent = t("dailyHelper");
+      document.getElementById("label-date").textContent = t("labelDate");
+      document.getElementById("label-revenue").textContent = t("labelRevenue");
+      document.getElementById("label-orders").textContent = t("labelOrders");
+      document.getElementById("label-leads").textContent = t("labelLeads");
+      document.getElementById("label-customers").textContent = t("labelCustomers");
+      document.getElementById("save-record").textContent = t("saveRecord");
+      document.getElementById("prefill-sample").textContent = t("prefillSample");
+      document.getElementById("bulk-title").textContent = t("bulkTitle");
+      document.getElementById("bulk-helper").textContent = t("bulkHelper");
+      document.getElementById("label-bulk").textContent = t("labelBulk");
+      document.getElementById("import-records").textContent = t("importRecords");
+      document.getElementById("clear-records").textContent = t("clearRecords");
+      document.getElementById("bulk-tip").textContent = t("bulkTip");
+      document.getElementById("hero-eyebrow").textContent = t("heroEyebrow");
+      document.getElementById("hero-title").textContent = t("heroTitle");
+      document.getElementById("hero-desc").textContent = t("heroDesc");
+      document.getElementById("metric-revenue-title").textContent = t("totalRevenue");
+      document.getElementById("metric-orders-title").textContent = t("totalOrders");
+      document.getElementById("metric-leads-title").textContent = t("totalLeads");
+      document.getElementById("metric-customers-title").textContent = t("totalCustomers");
+      document.getElementById("chart-title").textContent = t("chartTitle");
+      document.getElementById("chart-helper").textContent = t("chartHelper");
+      document.getElementById("option-metric-revenue").textContent = t("optionRevenue");
+      document.getElementById("option-metric-orders").textContent = t("optionOrders");
+      document.getElementById("option-metric-leads").textContent = t("optionLeads");
+      document.getElementById("option-metric-customers").textContent = t("optionCustomers");
+      document.getElementById("mode-daily").textContent = t("modeDaily");
+      document.getElementById("mode-cumulative").textContent = t("modeCumulative");
+      document.getElementById("legend-current").textContent = t("legendCurrent");
+      document.getElementById("legend-area").textContent = t("legendArea");
+      document.getElementById("legend-previous").textContent = t("legendPrevious");
+      document.getElementById("performance-title").textContent = t("performanceTitle");
+      document.getElementById("performance-helper").textContent = t("performanceHelper");
+      document.getElementById("performance-header-metric").textContent = t("performanceHeaderMetric");
+      document.getElementById("performance-header-change").textContent = t("performanceHeaderChange");
+      document.getElementById("funnel-title").textContent = t("funnelTitle");
+      document.getElementById("funnel-helper").textContent = t("funnelHelper");
+      document.getElementById("records-title").textContent = t("recordsTitle");
+      document.getElementById("records-helper").textContent = t("recordsHelper");
+      document.getElementById("records-header-date").textContent = t("recordsHeaderDate");
+      document.getElementById("records-header-revenue").textContent = t("recordsHeaderRevenue");
+      document.getElementById("records-header-orders").textContent = t("recordsHeaderOrders");
+      document.getElementById("records-header-leads").textContent = t("recordsHeaderLeads");
+      document.getElementById("records-header-customers").textContent = t("recordsHeaderCustomers");
+      document.getElementById("records-header-l2o").textContent = t("recordsHeaderL2O");
+      document.getElementById("records-header-o2c").textContent = t("recordsHeaderO2C");
+      elements.emptyState.textContent = t("emptyState");
+      elements.inputRevenue.placeholder = t("placeholderRevenue");
+      elements.inputOrders.placeholder = t("placeholderOrders");
+      elements.inputLeads.placeholder = t("placeholderLeads");
+      elements.inputCustomers.placeholder = t("placeholderCustomers");
+      elements.bulkInput.placeholder = t("bulkPlaceholder");
+      elements.metricSelect.setAttribute("aria-label", t("metricSelectAria"));
+      elements.chart.setAttribute("aria-label", t("chartAria"));
+      document.querySelector(".segmented").setAttribute("aria-label", t("modeAria"));
+      renderStatus();
+    }
+
+    function applyTheme() {
+      document.documentElement.dataset.theme = state.theme;
+    }
+
+    function normalizeRecord(record) {
+      return {
+        date: String(record.date),
+        revenue: sanitizeNumber(record.revenue),
+        orders: Math.round(sanitizeNumber(record.orders)),
+        leads: Math.round(sanitizeNumber(record.leads)),
+        customers: Math.round(sanitizeNumber(record.customers))
+      };
+    }
+
+    function normalizeRecords(records) {
+      const map = new Map();
+      records
+        .map(normalizeRecord)
+        .filter((record) => record.date)
+        .forEach((record) => {
+          map.set(record.date, record);
+        });
+      return [...map.values()].sort((a, b) => a.date.localeCompare(b.date));
+    }
+
+    function sanitizeNumber(value) {
+      const numeric = Number(value);
+      return Number.isFinite(numeric) && numeric >= 0 ? numeric : 0;
+    }
+
+    function todayString() {
+      const now = new Date();
+      const offset = now.getTimezoneOffset() * 60000;
+      return new Date(now.getTime() - offset).toISOString().slice(0, 10);
+    }
+
+    function renderStatus() {
+      if (!state.statusInfo) {
+        return;
+      }
+      elements.statusText.textContent = t(state.statusInfo.key, state.statusInfo.vars);
+      elements.statusText.style.color = state.statusInfo.tone === "error" ? "var(--red)" : "var(--green)";
+    }
+
+    function setStatus(key, tone = "success", vars = {}) {
+      state.statusInfo = { key, tone, vars };
+      renderStatus();
+    }
+
+    function resetForm() {
+      elements.inputDate.value = todayString();
+      elements.inputRevenue.value = "";
+      elements.inputOrders.value = "";
+      elements.inputLeads.value = "";
+      elements.inputCustomers.value = "";
+    }
+
+    function saveRecordFromForm() {
+      const date = elements.inputDate.value;
+      if (!date) {
+        setStatus("statusSelectDate", "error");
+        return;
+      }
+
+      const record = normalizeRecord({
+        date,
+        revenue: elements.inputRevenue.value,
+        orders: elements.inputOrders.value,
+        leads: elements.inputLeads.value,
+        customers: elements.inputCustomers.value
+      });
+
+      const existingIndex = state.records.findIndex((item) => item.date === date);
+      if (existingIndex >= 0) {
+        state.records[existingIndex] = record;
+      } else {
+        state.records.push(record);
+      }
+
+      state.records = normalizeRecords(state.records);
+      persistRecords();
+      renderDashboard();
+      setStatus(existingIndex >= 0 ? "statusUpdated" : "statusSaved");
+      resetForm();
+    }
+
+    function loadSampleData() {
+      state.records = normalizeRecords(sampleRecords);
+      persistRecords();
+      renderDashboard();
+      setStatus("statusSampleLoaded");
+    }
+
+    function importBulkData() {
+      const lines = elements.bulkInput.value
+        .split(/\n+/)
+        .map((line) => line.trim())
+        .filter(Boolean);
+
+      if (!lines.length) {
+        setStatus("statusPasteCsv", "error");
+        return;
+      }
+
+      const imported = [];
+      for (const line of lines) {
+        const [date, revenue, orders, leads, customers] = line.split(/[,\t，]+/).map((item) => item.trim());
+        if (!date) {
+          continue;
+        }
+        imported.push(normalizeRecord({ date, revenue, orders, leads, customers }));
+      }
+
+      if (!imported.length) {
+        setStatus("statusInvalidImport", "error");
+        return;
+      }
+
+      state.records = normalizeRecords([...state.records, ...imported]);
+      persistRecords();
+      renderDashboard();
+      setStatus("statusImported", "success", { count: formatNumber(imported.length) });
+      elements.bulkInput.value = "";
+    }
+
+    function clearAllRecords() {
+      const confirmed = window.confirm(t("confirmClear"));
+      if (!confirmed) {
+        return;
+      }
+
+      state.records = [];
+      persistRecords();
+      renderDashboard();
+      resetForm();
+      setStatus("statusCleared");
+    }
+
+    function handleRecordRowClick(event) {
+      const row = event.target.closest("tr[data-date]");
+      if (!row) {
+        return;
+      }
+      const record = state.records.find((item) => item.date === row.dataset.date);
+      if (!record) {
+        return;
+      }
+      elements.inputDate.value = record.date;
+      elements.inputRevenue.value = record.revenue;
+      elements.inputOrders.value = record.orders;
+      elements.inputLeads.value = record.leads;
+      elements.inputCustomers.value = record.customers;
+      setStatus("statusPrefilled", "success", { date: formatDate(record.date) });
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+
+    function sumBy(records, key) {
+      return records.reduce((sum, record) => sum + sanitizeNumber(record[key]), 0);
+    }
+
+    function formatCurrency(value) {
+      return new Intl.NumberFormat(currentLocale(), {
+        style: "currency",
+        currency: currentCurrency(),
+        maximumFractionDigits: 0
+      }).format(value || 0);
+    }
+
+    function formatNumber(value) {
+      return new Intl.NumberFormat(currentLocale(), {
+        maximumFractionDigits: 0
+      }).format(value || 0);
+    }
+
+    function formatDecimal(value, minimumFractionDigits = 1, maximumFractionDigits = 1) {
+      return new Intl.NumberFormat(currentLocale(), {
+        minimumFractionDigits,
+        maximumFractionDigits
+      }).format(value || 0);
+    }
+
+    function formatRate(value) {
+      if (!Number.isFinite(value)) {
+        return t("commonNa");
+      }
+      return new Intl.NumberFormat(currentLocale(), {
+        style: "percent",
+        minimumFractionDigits: 1,
+        maximumFractionDigits: 1
+      }).format(value);
+    }
+
+    function formatMetricValue(metric, value) {
+      return metric === "revenue" ? formatCurrency(value) : formatNumber(value);
+    }
+
+    function metricLabel(metric) {
+      return {
+        revenue: t("optionRevenue"),
+        orders: t("optionOrders"),
+        leads: t("optionLeads"),
+        customers: t("optionCustomers")
+      }[metric];
+    }
+
+    function getPeriodSlices() {
+      const ordered = [...state.records];
+      const windowSize = Math.min(7, Math.max(1, ordered.length));
+      const current = ordered.slice(-windowSize);
+      const previous = ordered.slice(-windowSize * 2, -windowSize);
+      return { current, previous, windowSize };
+    }
+
+    function changeRate(current, previous) {
+      if (!previous && current) {
+        return Number.POSITIVE_INFINITY;
+      }
+      if (!previous && !current) {
+        return 0;
+      }
+      return (current - previous) / previous;
+    }
+
+    function renderDashboard() {
+      renderHeroPeriod();
+      renderMetricCards();
+      renderPerformanceTable();
+      renderFunnel();
+      renderRecordsTable();
+      renderChart();
+      updateModeButtons();
+    }
+
+    function renderHeroPeriod() {
+      const { current, previous } = getPeriodSlices();
+      elements.chipRange.textContent = current.length
+        ? t("periodCurrent", { start: formatDate(current[0].date), end: formatDate(current[current.length - 1].date) })
+        : t("periodCurrentEmpty");
+      elements.chipPeriod.textContent = previous.length
+        ? t("periodPrevious", { start: formatDate(previous[0].date), end: formatDate(previous[previous.length - 1].date) })
+        : t("periodPreviousEmpty");
+    }
+
+    function renderMetricCards() {
+      const totalRevenue = sumBy(state.records, "revenue");
+      const totalOrders = sumBy(state.records, "orders");
+      const totalLeads = sumBy(state.records, "leads");
+      const totalCustomers = sumBy(state.records, "customers");
+      const { current, previous } = getPeriodSlices();
+
+      const currentRevenue = sumBy(current, "revenue");
+      const previousRevenue = sumBy(previous, "revenue");
+      const currentOrders = sumBy(current, "orders");
+      const currentLeads = sumBy(current, "leads");
+      const currentCustomers = sumBy(current, "customers");
+
+      const revenueChange = describeChange(changeRate(currentRevenue, previousRevenue));
+      const leadToOrder = currentLeads ? currentOrders / currentLeads : 0;
+      const leadQuality = current.length ? currentLeads / current.length : 0;
+      const orderToCustomer = currentOrders ? currentCustomers / currentOrders : 0;
+
+      elements.metricRevenue.textContent = formatCurrency(totalRevenue);
+      elements.metricRevenueNote.textContent = t("metricRevenueNote", { change: revenueChange });
+      elements.metricOrders.textContent = formatNumber(totalOrders);
+      elements.metricOrdersNote.textContent = t("metricOrdersNote", { rate: formatRate(leadToOrder) });
+      elements.metricLeads.textContent = formatNumber(totalLeads);
+      elements.metricLeadsNote.textContent = current.length ? t("metricLeadsNote", { value: formatDecimal(leadQuality) }) : t("metricLeadsNoteEmpty");
+      elements.metricCustomers.textContent = formatNumber(totalCustomers);
+      elements.metricCustomersNote.textContent = t("metricCustomersNote", { rate: formatRate(orderToCustomer) });
+    }
+
+    function renderPerformanceTable() {
+      const { current, previous } = getPeriodSlices();
+      elements.currentPeriodLabel.textContent = current.length
+        ? t("performanceHeaderCurrent", { start: formatShortDate(current[0].date), end: formatShortDate(current[current.length - 1].date) })
+        : t("performanceHeaderCurrentEmpty");
+      elements.previousPeriodLabel.textContent = previous.length
+        ? t("performanceHeaderPrevious", { start: formatShortDate(previous[0].date), end: formatShortDate(previous[previous.length - 1].date) })
+        : t("performanceHeaderPreviousEmpty");
+
+      const rows = [
+        { label: t("tableRevenue"), current: sumBy(current, "revenue"), previous: sumBy(previous, "revenue"), metric: "revenue" },
+        { label: t("tableOrders"), current: sumBy(current, "orders"), previous: sumBy(previous, "orders") },
+        { label: t("tableLeads"), current: sumBy(current, "leads"), previous: sumBy(previous, "leads") },
+        { label: t("tableCustomers"), current: sumBy(current, "customers"), previous: sumBy(previous, "customers") },
+        {
+          label: t("tableLeadToOrder"),
+          current: sumBy(current, "leads") ? sumBy(current, "orders") / sumBy(current, "leads") : 0,
+          previous: sumBy(previous, "leads") ? sumBy(previous, "orders") / sumBy(previous, "leads") : 0,
+          formatter: formatRate
+        },
+        {
+          label: t("tableOrderToCustomer"),
+          current: sumBy(current, "orders") ? sumBy(current, "customers") / sumBy(current, "orders") : 0,
+          previous: sumBy(previous, "orders") ? sumBy(previous, "customers") / sumBy(previous, "orders") : 0,
+          formatter: formatRate
+        },
+        {
+          label: t("tableRevenuePerOrder"),
+          current: sumBy(current, "orders") ? sumBy(current, "revenue") / sumBy(current, "orders") : 0,
+          previous: sumBy(previous, "orders") ? sumBy(previous, "revenue") / sumBy(previous, "orders") : 0,
+          metric: "revenue"
+        }
+      ];
+
+      elements.performanceBody.innerHTML = rows.map((row) => {
+        const formatter = row.formatter || ((value) => row.metric === "revenue" ? formatCurrency(value) : formatNumber(value));
+        const delta = changeRate(row.current, row.previous);
+        return `
+          <tr>
+            <td>${row.label}</td>
+            <td>${formatter(row.current)}</td>
+            <td>${formatter(row.previous)}</td>
+            <td class="${deltaClass(delta)}">${formatDelta(delta)}</td>
+          </tr>
+        `;
+      }).join("");
+    }
+
+    function renderFunnel() {
+      const { current } = getPeriodSlices();
+      const leads = sumBy(current, "leads");
+      const orders = sumBy(current, "orders");
+      const customers = sumBy(current, "customers");
+      const baseline = Math.max(leads, 1);
+
+      const blocks = [
+        { label: t("funnelLeads"), value: leads, rate: 1 },
+        { label: t("funnelOrders"), value: orders, rate: orders / baseline },
+        { label: t("funnelCustomers"), value: customers, rate: customers / baseline }
+      ];
+
+      elements.funnelGrid.innerHTML = blocks.map((block) => `
+        <div class="bar-block">
+          <div class="bar-meta">
+            <span>${block.label}</span>
+            <strong>${formatNumber(block.value)}</strong>
+          </div>
+          <div class="bar-track">
+            <div class="bar-fill" style="width: ${Math.min(block.rate * 100, 100)}%;"></div>
+          </div>
+        </div>
+      `).join("");
+
+      const leadToOrder = leads ? orders / leads : 0;
+      const orderToCustomer = orders ? customers / orders : 0;
+      const leadToCustomer = leads ? customers / leads : 0;
+      const revenuePerCustomer = customers ? sumBy(current, "revenue") / customers : 0;
+
+      elements.funnelNotes.innerHTML = `
+        <div class="note-row"><span>${t("funnelLeadToOrder")}</span><strong>${formatRate(leadToOrder)}</strong></div>
+        <div class="note-row"><span>${t("funnelOrderToCustomer")}</span><strong>${formatRate(orderToCustomer)}</strong></div>
+        <div class="note-row"><span>${t("funnelLeadToCustomer")}</span><strong>${formatRate(leadToCustomer)}</strong></div>
+        <div class="note-row"><span>${t("funnelRevenuePerCustomer")}</span><strong>${formatCurrency(revenuePerCustomer)}</strong></div>
+      `;
+    }
+
+    function renderRecordsTable() {
+      elements.recordCount.textContent = t("recordsCount", { count: formatNumber(state.records.length) });
+      elements.emptyState.hidden = state.records.length > 0;
+      elements.recordsBody.innerHTML = state.records.map((record) => {
+        const leadToOrder = record.leads ? record.orders / record.leads : 0;
+        const orderToCustomer = record.orders ? record.customers / record.orders : 0;
+        return `
+          <tr data-date="${record.date}">
+            <td>${formatDate(record.date)}</td>
+            <td>${formatCurrency(record.revenue)}</td>
+            <td>${formatNumber(record.orders)}</td>
+            <td>${formatNumber(record.leads)}</td>
+            <td>${formatNumber(record.customers)}</td>
+            <td>${formatRate(leadToOrder)}</td>
+            <td>${formatRate(orderToCustomer)}</td>
+          </tr>
+        `;
+      }).join("");
+    }
+
+    function renderChart() {
+      const metric = state.metric;
+      const ordered = state.records;
+      const width = 960;
+      const height = 380;
+      const padding = { top: 26, right: 20, bottom: 48, left: 72 };
+
+      if (!ordered.length) {
+        elements.chart.innerHTML = `<text x="${width / 2}" y="${height / 2}" fill="var(--chart-label)" text-anchor="middle" font-size="18">${t("chartNoData")}</text>`;
+        return;
+      }
+
+      const values = ordered.map((record) => sanitizeNumber(record[metric]));
+      const series = state.mode === "cumulative"
+        ? values.map((_, index) => values.slice(0, index + 1).reduce((sum, value) => sum + value, 0))
+        : values;
+
+      const { current, previous, windowSize } = getPeriodSlices();
+      const currentValues = current.map((record) => sanitizeNumber(record[metric]));
+      const previousValues = previous.map((record) => sanitizeNumber(record[metric]));
+      const compareCurrent = state.mode === "cumulative"
+        ? currentValues.map((_, index) => currentValues.slice(0, index + 1).reduce((sum, value) => sum + value, 0))
+        : currentValues;
+      const comparePrevious = state.mode === "cumulative"
+        ? previousValues.map((_, index) => previousValues.slice(0, index + 1).reduce((sum, value) => sum + value, 0))
+        : previousValues;
+
+      const maxValue = Math.max(...series, ...compareCurrent, ...comparePrevious, 1);
+      const ticks = 4;
+      const tickLabels = Array.from({ length: ticks + 1 }, (_, index) => shortValue(metric, maxValue - (maxValue * index) / ticks));
+      padding.left = Math.max(72, Math.ceil(Math.max(...tickLabels.map((label) => measureTextWidth(label, "12px Avenir Next, PingFang SC, Segoe UI, sans-serif"))) + 24));
+      const innerWidth = width - padding.left - padding.right;
+      const innerHeight = height - padding.top - padding.bottom;
+
+      const points = series.map((value, index) => {
+        const x = padding.left + (ordered.length === 1 ? innerWidth / 2 : (innerWidth * index) / (ordered.length - 1));
+        const y = padding.top + innerHeight - (value / maxValue) * innerHeight;
+        return [x, y];
+      });
+
+      const previousPoints = comparePrevious.map((value, index) => {
+        const x = padding.left + (windowSize === 1 ? innerWidth / 2 : (innerWidth * index) / (windowSize - 1));
+        const y = padding.top + innerHeight - (value / maxValue) * innerHeight;
+        return [x, y];
+      });
+
+      const path = buildLinePath(points);
+      const areaPath = buildAreaPath(points, height - padding.bottom);
+      const previousPath = buildLinePath(previousPoints);
+
+      const grid = Array.from({ length: ticks + 1 }, (_, index) => {
+        const y = padding.top + (innerHeight * index) / ticks;
+        const value = maxValue - (maxValue * index) / ticks;
+        return `
+          <line x1="${padding.left}" y1="${y}" x2="${width - padding.right}" y2="${y}" stroke="var(--grid-line)" />
+          <text x="${padding.left - 14}" y="${y + 4}" fill="var(--chart-label)" text-anchor="end" font-size="12">${shortValue(metric, value)}</text>
+        `;
+      }).join("");
+
+      const xLabels = ordered.map((record, index) => {
+        if (ordered.length > 8 && index % Math.ceil(ordered.length / 8) !== 0 && index !== ordered.length - 1) {
+          return "";
+        }
+        const x = padding.left + (ordered.length === 1 ? innerWidth / 2 : (innerWidth * index) / (ordered.length - 1));
+        return `<text x="${x}" y="${height - 18}" fill="var(--chart-label)" text-anchor="middle" font-size="12">${formatShortDate(record.date)}</text>`;
+      }).join("");
+
+      const compareLabel = state.mode === "cumulative"
+        ? t("chartLabelCumulative", { metric: metricLabel(metric) })
+        : t("chartLabelDaily", { metric: metricLabel(metric) });
+
+      elements.chart.innerHTML = `
+        <defs>
+          <linearGradient id="area-fill" x1="0" x2="0" y1="0" y2="1">
+            <stop offset="0%" stop-color="rgba(48, 210, 123, 0.22)"></stop>
+            <stop offset="100%" stop-color="rgba(47, 108, 246, 0.03)"></stop>
+          </linearGradient>
+        </defs>
+        ${grid}
+        <text x="${width / 2}" y="18" fill="var(--chart-title)" text-anchor="middle" font-size="16">${compareLabel}</text>
+        <path d="${areaPath}" fill="url(#area-fill)"></path>
+        <path d="${path}" fill="none" stroke="rgba(139, 183, 255, 0.95)" stroke-width="3"></path>
+        ${previousPoints.length ? `<path d="${previousPath}" fill="none" stroke="rgba(223, 180, 142, 0.75)" stroke-width="2.5" stroke-dasharray="7 6"></path>` : ""}
+        ${xLabels}
+      `;
+    }
+
+    function buildLinePath(points) {
+      if (!points.length) {
+        return "";
+      }
+      return points.reduce((path, point, index) => {
+        const prefix = index === 0 ? "M" : "L";
+        return `${path}${prefix}${point[0]},${point[1]} `;
+      }, "").trim();
+    }
+
+    function buildAreaPath(points, baseline) {
+      if (!points.length) {
+        return "";
+      }
+      const line = buildLinePath(points);
+      const first = points[0];
+      const last = points[points.length - 1];
+      return `${line} L${last[0]},${baseline} L${first[0]},${baseline} Z`;
+    }
+
+    function shortValue(metric, value) {
+      if (metric === "revenue") {
+        return new Intl.NumberFormat(currentLocale(), {
+          style: "currency",
+          currency: currentCurrency(),
+          notation: "compact",
+          maximumFractionDigits: 1
+        }).format(value);
+      }
+      return new Intl.NumberFormat(currentLocale(), {
+        notation: "compact",
+        maximumFractionDigits: 1
+      }).format(value);
+    }
+
+    function measureTextWidth(text, font) {
+      if (!measureTextWidth.canvas) {
+        measureTextWidth.canvas = document.createElement("canvas");
+      }
+      const context = measureTextWidth.canvas.getContext("2d");
+      context.font = font;
+      return context.measureText(text).width;
+    }
+
+    function describeChange(delta) {
+      if (!Number.isFinite(delta)) {
+        return t("changeNoPrevious");
+      }
+      if (delta === 0) {
+        return t("changeFlat");
+      }
+      const value = new Intl.NumberFormat(currentLocale(), {
+        style: "percent",
+        minimumFractionDigits: 1,
+        maximumFractionDigits: 1
+      }).format(Math.abs(delta));
+      return delta > 0 ? t("changeUp", { value }) : t("changeDown", { value });
+    }
+
+    function deltaClass(delta) {
+      if (!Number.isFinite(delta) || delta === 0) {
+        return "neutral";
+      }
+      return delta > 0 ? "positive" : "negative";
+    }
+
+    function formatDelta(delta) {
+      if (!Number.isFinite(delta)) {
+        return t("deltaNewPeriod");
+      }
+      if (delta === 0) {
+        return new Intl.NumberFormat(currentLocale(), {
+          style: "percent",
+          maximumFractionDigits: 0
+        }).format(0);
+      }
+      const value = new Intl.NumberFormat(currentLocale(), {
+        style: "percent",
+        minimumFractionDigits: 1,
+        maximumFractionDigits: 1
+      }).format(Math.abs(delta));
+      return `${delta > 0 ? "+" : "-"}${value}`;
+    }
+
+    function parseDateParts(dateString) {
+      const [year, month, day] = String(dateString).split("-").map(Number);
+      return new Date(year, month - 1, day);
+    }
+
+    function formatDate(dateString) {
+      return new Intl.DateTimeFormat(currentLocale(), {
+        year: "numeric",
+        month: "2-digit",
+        day: "2-digit"
+      }).format(parseDateParts(dateString));
+    }
+
+    function formatShortDate(dateString) {
+      return new Intl.DateTimeFormat(currentLocale(), {
+        month: "2-digit",
+        day: "2-digit"
+      }).format(parseDateParts(dateString));
+    }
+
+    function setMode(mode) {
+      state.mode = mode;
+      renderDashboard();
+    }
+
+    function updateModeButtons() {
+      document.querySelectorAll("[data-mode]").forEach((button) => {
+        button.classList.toggle("active", button.dataset.mode === state.mode);
+      });
+    }
+  </script>
+</body>
+</html>

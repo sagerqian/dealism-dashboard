@@ -1,0 +1,32 @@
+有关私域的英文名词
+Part 1：［私域运营类名词］
+1、Private traffic「私域流量」
+2、Engaged User「用户驱动」
+3、Live E-commerce「直播电商」
+4、Value Chain「价值链」
+5、RFM模型：（Recency.Frequency. Monetary）
+值的指数模型
+可以用来划分和用户价
+R（Recency） 最近一次消费时间
+F（Frequency）消费频次
+M（Monetary）总消费金额
+6、AARRR模型：被称为海盗模型、客户漏斗模型
+用户获取（Acquisition）、用户激活（Activation）、用户留存（Retention）、
+获得收益（Revenue）、推荐传播（Referral）
+185
+7、ARPU：（Average Revenue Per User）每用户平均收入，即总收入/用户数
+8. CAC： （Customer Acquisition Cost） 意思是“用户获取成本”
+9. LTV：（Life Time Value）：全生命周期价值LTV=LT*ARPU
+10、PBP：（Payback Period） 成本回收速度11、BEP：（Break Even Point）
+盈亏平衡点
+12、ROI：（Return On Mnvestment）投资回报率
+13、GMV： （Gross Merchandise Volume）阶段内成交总额
+14、UED、 UXD（简称 UE）：（User Experience Design）用户体验设计
+15、Focus Group：焦点小组
+16、 Brand Loyalty「品牌忠诚度」
+17、Consumer Insights「消费者洞察」
+18、ACU：（Average Concurrent Users）平均同时在线人数
+19、PCU：（Peak Concurrent Users）最高同时在线人数
+20、DAU：（Daily Active User）日活跃用户数量
+21、MAU （Monthly Active User） 月活跃用户数量
+186
