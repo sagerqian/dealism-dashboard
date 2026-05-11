@@ -389,18 +389,81 @@
     }
 
     .chart-wrap {
+      position: relative;
       background:
         linear-gradient(180deg, var(--surface-soft), transparent 100%),
         var(--surface-softer);
       border: 1px solid var(--stroke);
       border-radius: 20px;
       padding: 18px;
+      overflow: hidden;
     }
 
     #trend-chart {
       width: 100%;
       height: 380px;
       display: block;
+    }
+
+    .chart-tooltip {
+      position: absolute;
+      min-width: 180px;
+      max-width: 240px;
+      padding: 12px 14px;
+      border-radius: 14px;
+      border: 1px solid var(--stroke-strong);
+      background: var(--bg-elevated);
+      box-shadow: 0 16px 34px rgba(0, 0, 0, 0.18);
+      backdrop-filter: blur(16px);
+      pointer-events: none;
+      opacity: 0;
+      transform: translate3d(0, 0, 0);
+      transition: opacity 0.16s ease;
+      z-index: 3;
+    }
+
+    .chart-tooltip.visible {
+      opacity: 1;
+    }
+
+    .chart-tooltip-date {
+      color: var(--text);
+      font-size: 13px;
+      font-weight: 600;
+      margin-bottom: 8px;
+    }
+
+    .chart-tooltip-grid {
+      display: grid;
+      gap: 6px;
+    }
+
+    .chart-tooltip-row {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      align-items: center;
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    .chart-tooltip-label {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .chart-tooltip-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 999px;
+      display: inline-block;
+      flex: 0 0 auto;
+    }
+
+    .chart-tooltip-value {
+      color: var(--text);
+      font-weight: 600;
     }
 
     .legend {
@@ -716,28 +779,18 @@
         <div class="card-header">
           <div>
             <h3 id="chart-title">趋势图</h3>
-            <p id="chart-helper">支持按指标切换，并在日趋势与累计趋势之间查看变化。</p>
-          </div>
-          <div class="header-actions">
-            <select id="metric-select" aria-label="选择指标">
-              <option id="option-metric-revenue" value="revenue">成交额</option>
-              <option id="option-metric-orders" value="orders">订单量</option>
-              <option id="option-metric-leads" value="leads">线索量</option>
-              <option id="option-metric-customers" value="customers">成交客户数</option>
-            </select>
-            <div class="segmented" role="tablist" aria-label="趋势模式">
-              <button class="active" id="mode-daily" data-mode="daily">日趋势</button>
-              <button id="mode-cumulative" data-mode="cumulative">累计趋势</button>
-            </div>
+            <p id="chart-helper">4 条核心数据会同时显示在同一张图里，方便直接比较走势，不需要切换。</p>
           </div>
         </div>
         <div class="chart-wrap">
           <svg id="trend-chart" viewBox="0 0 960 380" preserveAspectRatio="none" aria-label="趋势图"></svg>
+          <div class="chart-tooltip" id="chart-tooltip" aria-hidden="true"></div>
         </div>
         <div class="legend">
-          <span><i style="background: var(--blue);"></i><span id="legend-current">当前数据走势</span></span>
-          <span><i style="background: var(--green);"></i><span id="legend-area">面积辅助层</span></span>
-          <span><i style="background: var(--amber);"></i><span id="legend-previous">当前周期对比上一周期</span></span>
+          <span><i style="background: #4f8df7;"></i><span id="legend-revenue">成交额</span></span>
+          <span><i style="background: #6a39c2;"></i><span id="legend-orders">订单量</span></span>
+          <span><i style="background: #0f9d8d;"></i><span id="legend-leads">线索量</span></span>
+          <span><i style="background: #f37b00;"></i><span id="legend-customers">成交客户数</span></span>
         </div>
       </section>
 
@@ -871,19 +924,16 @@
         totalLeads: "累计线索量",
         totalCustomers: "成交客户数",
         chartTitle: "趋势图",
-        chartHelper: "支持按指标切换，并在日趋势与累计趋势之间查看变化。",
+        chartHelper: "4 条核心数据会同时显示在同一张图里，方便直接比较走势，不需要切换。",
         chartAria: "趋势图",
-        metricSelectAria: "选择指标",
-        modeAria: "趋势模式",
         optionRevenue: "成交额",
         optionOrders: "订单量",
         optionLeads: "线索量",
         optionCustomers: "成交客户数",
-        modeDaily: "日趋势",
-        modeCumulative: "累计趋势",
-        legendCurrent: "当前数据走势",
-        legendArea: "面积辅助层",
-        legendPrevious: "当前周期对比上一周期",
+        legendRevenue: "成交额",
+        legendOrders: "订单量",
+        legendLeads: "线索量",
+        legendCustomers: "成交客户数",
         performanceTitle: "周期表现",
         performanceHelper: "默认比较最近 7 条数据与前 7 条数据，变化率自动计算。",
         performanceHeaderMetric: "指标",
@@ -990,19 +1040,16 @@
         totalLeads: "Total Leads",
         totalCustomers: "Closed Customers",
         chartTitle: "Trend Chart",
-        chartHelper: "Switch metrics and compare daily versus cumulative movement.",
+        chartHelper: "All 4 core metrics are shown together in one chart, so the trend can be compared without switching.",
         chartAria: "Trend chart",
-        metricSelectAria: "Select metric",
-        modeAria: "Trend mode",
         optionRevenue: "Revenue",
         optionOrders: "Orders",
         optionLeads: "Leads",
         optionCustomers: "Closed Customers",
-        modeDaily: "Daily",
-        modeCumulative: "Cumulative",
-        legendCurrent: "Current trend",
-        legendArea: "Area layer",
-        legendPrevious: "Current period vs previous",
+        legendRevenue: "Revenue",
+        legendOrders: "Orders",
+        legendLeads: "Leads",
+        legendCustomers: "Closed Customers",
         performanceTitle: "Period Performance",
         performanceHelper: "Compares the latest 7 records with the previous 7 automatically.",
         performanceHeaderMetric: "Metric",
@@ -1109,19 +1156,16 @@
         totalLeads: "Total de Leads",
         totalCustomers: "Clientes Fechados",
         chartTitle: "Gráfico de Tendência",
-        chartHelper: "Troque a métrica e compare movimento diário versus acumulado.",
+        chartHelper: "As 4 métricas principais aparecem juntas no mesmo gráfico, para comparar tendência sem trocar a visualização.",
         chartAria: "Gráfico de tendência",
-        metricSelectAria: "Selecionar métrica",
-        modeAria: "Modo de tendência",
         optionRevenue: "Receita",
         optionOrders: "Pedidos",
         optionLeads: "Leads",
         optionCustomers: "Clientes Fechados",
-        modeDaily: "Diário",
-        modeCumulative: "Acumulado",
-        legendCurrent: "Tendência atual",
-        legendArea: "Camada de área",
-        legendPrevious: "Período atual vs anterior",
+        legendRevenue: "Receita",
+        legendOrders: "Pedidos",
+        legendLeads: "Leads",
+        legendCustomers: "Clientes Fechados",
         performanceTitle: "Desempenho do Período",
         performanceHelper: "Compara automaticamente os 7 registros mais recentes com os 7 anteriores.",
         performanceHeaderMetric: "Métrica",
@@ -1228,19 +1272,16 @@
         totalLeads: "Leads Totales",
         totalCustomers: "Clientes Cerrados",
         chartTitle: "Gráfico de Tendencia",
-        chartHelper: "Cambia la métrica y compara movimiento diario frente a acumulado.",
+        chartHelper: "Las 4 métricas principales se muestran juntas en un solo gráfico para comparar tendencias sin cambiar de vista.",
         chartAria: "Gráfico de tendencia",
-        metricSelectAria: "Seleccionar métrica",
-        modeAria: "Modo de tendencia",
         optionRevenue: "Ingresos",
         optionOrders: "Pedidos",
         optionLeads: "Leads",
         optionCustomers: "Clientes Cerrados",
-        modeDaily: "Diario",
-        modeCumulative: "Acumulado",
-        legendCurrent: "Tendencia actual",
-        legendArea: "Capa de área",
-        legendPrevious: "Periodo actual vs anterior",
+        legendRevenue: "Ingresos",
+        legendOrders: "Pedidos",
+        legendLeads: "Leads",
+        legendCustomers: "Clientes Cerrados",
         performanceTitle: "Rendimiento del Periodo",
         performanceHelper: "Compara automáticamente los 7 registros más recientes con los 7 anteriores.",
         performanceHeaderMetric: "Métrica",
@@ -1307,11 +1348,10 @@
 
     const state = {
       records: loadRecords(),
-      metric: "revenue",
-      mode: "daily",
       language: loadLanguage(),
       theme: loadTheme(),
-      statusInfo: null
+      statusInfo: null,
+      chartHoverData: null
     };
 
     const elements = {
@@ -1324,8 +1364,9 @@
       inputCustomers: document.getElementById("input-customers"),
       bulkInput: document.getElementById("bulk-input"),
       statusText: document.getElementById("status-text"),
-      metricSelect: document.getElementById("metric-select"),
+      chartWrap: document.querySelector(".chart-wrap"),
       chart: document.getElementById("trend-chart"),
+      chartTooltip: document.getElementById("chart-tooltip"),
       performanceBody: document.getElementById("performance-body"),
       funnelGrid: document.getElementById("funnel-grid"),
       funnelNotes: document.getElementById("funnel-notes"),
@@ -1350,8 +1391,6 @@
     document.getElementById("prefill-sample").addEventListener("click", loadSampleData);
     document.getElementById("import-records").addEventListener("click", importBulkData);
     document.getElementById("clear-records").addEventListener("click", clearAllRecords);
-    document.getElementById("mode-daily").addEventListener("click", () => setMode("daily"));
-    document.getElementById("mode-cumulative").addEventListener("click", () => setMode("cumulative"));
     elements.languageSelect.addEventListener("change", (event) => {
       state.language = event.target.value;
       persistLanguage();
@@ -1363,11 +1402,9 @@
       persistTheme();
       applyTheme();
     });
-    elements.metricSelect.addEventListener("change", (event) => {
-      state.metric = event.target.value;
-      renderDashboard();
-    });
     elements.recordsBody.addEventListener("click", handleRecordRowClick);
+    elements.chart.addEventListener("mousemove", handleChartPointerMove);
+    elements.chart.addEventListener("mouseleave", hideChartTooltip);
 
     elements.languageSelect.value = state.language;
     elements.themeSelect.value = state.theme;
@@ -1399,25 +1436,45 @@
     }
 
     function persistRecords() {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(state.records));
+      try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(state.records));
+      } catch (error) {
+        // Some in-app/file:// browsers block localStorage; keep working in memory.
+      }
     }
 
     function loadLanguage() {
-      const value = localStorage.getItem(LANGUAGE_KEY);
-      return translations[value] ? value : "zh";
+      try {
+        const value = localStorage.getItem(LANGUAGE_KEY);
+        return translations[value] ? value : "zh";
+      } catch (error) {
+        return "zh";
+      }
     }
 
     function persistLanguage() {
-      localStorage.setItem(LANGUAGE_KEY, state.language);
+      try {
+        localStorage.setItem(LANGUAGE_KEY, state.language);
+      } catch (error) {
+        // Ignore storage failures and keep the current in-memory preference.
+      }
     }
 
     function loadTheme() {
-      const value = localStorage.getItem(THEME_KEY);
-      return value === "light" ? "light" : "dark";
+      try {
+        const value = localStorage.getItem(THEME_KEY);
+        return value === "light" ? "light" : "dark";
+      } catch (error) {
+        return "dark";
+      }
     }
 
     function persistTheme() {
-      localStorage.setItem(THEME_KEY, state.theme);
+      try {
+        localStorage.setItem(THEME_KEY, state.theme);
+      } catch (error) {
+        // Ignore storage failures and keep the current in-memory preference.
+      }
     }
 
     function currentMessages() {
@@ -1471,15 +1528,10 @@
       document.getElementById("metric-customers-title").textContent = t("totalCustomers");
       document.getElementById("chart-title").textContent = t("chartTitle");
       document.getElementById("chart-helper").textContent = t("chartHelper");
-      document.getElementById("option-metric-revenue").textContent = t("optionRevenue");
-      document.getElementById("option-metric-orders").textContent = t("optionOrders");
-      document.getElementById("option-metric-leads").textContent = t("optionLeads");
-      document.getElementById("option-metric-customers").textContent = t("optionCustomers");
-      document.getElementById("mode-daily").textContent = t("modeDaily");
-      document.getElementById("mode-cumulative").textContent = t("modeCumulative");
-      document.getElementById("legend-current").textContent = t("legendCurrent");
-      document.getElementById("legend-area").textContent = t("legendArea");
-      document.getElementById("legend-previous").textContent = t("legendPrevious");
+      document.getElementById("legend-revenue").textContent = t("legendRevenue");
+      document.getElementById("legend-orders").textContent = t("legendOrders");
+      document.getElementById("legend-leads").textContent = t("legendLeads");
+      document.getElementById("legend-customers").textContent = t("legendCustomers");
       document.getElementById("performance-title").textContent = t("performanceTitle");
       document.getElementById("performance-helper").textContent = t("performanceHelper");
       document.getElementById("performance-header-metric").textContent = t("performanceHeaderMetric");
@@ -1501,9 +1553,7 @@
       elements.inputLeads.placeholder = t("placeholderLeads");
       elements.inputCustomers.placeholder = t("placeholderCustomers");
       elements.bulkInput.placeholder = t("bulkPlaceholder");
-      elements.metricSelect.setAttribute("aria-label", t("metricSelectAria"));
       elements.chart.setAttribute("aria-label", t("chartAria"));
-      document.querySelector(".segmented").setAttribute("aria-label", t("modeAria"));
       renderStatus();
     }
 
@@ -1686,6 +1736,10 @@
         minimumFractionDigits,
         maximumFractionDigits
       }).format(value || 0);
+    }
+
+    function formatChartMetricValue(metric, value) {
+      return metric === "revenue" ? formatCurrency(value) : formatNumber(value);
     }
 
     function formatRate(value) {
@@ -1885,62 +1939,42 @@
     }
 
     function renderChart() {
-      const metric = state.metric;
       const ordered = state.records;
       const width = 960;
       const height = 380;
-      const padding = { top: 26, right: 20, bottom: 48, left: 72 };
+      const padding = { top: 28, right: 18, bottom: 48, left: 28 };
+      const innerWidth = width - padding.left - padding.right;
+      const innerHeight = height - padding.top - padding.bottom;
+      const ticks = 4;
 
       if (!ordered.length) {
+        state.chartHoverData = null;
         elements.chart.innerHTML = `<text x="${width / 2}" y="${height / 2}" fill="var(--chart-label)" text-anchor="middle" font-size="18">${t("chartNoData")}</text>`;
+        hideChartTooltip();
         return;
       }
 
-      const values = ordered.map((record) => sanitizeNumber(record[metric]));
-      const series = state.mode === "cumulative"
-        ? values.map((_, index) => values.slice(0, index + 1).reduce((sum, value) => sum + value, 0))
-        : values;
+      const seriesConfig = [
+        { key: "revenue", color: "#4f8df7", label: t("optionRevenue") },
+        { key: "orders", color: "#6a39c2", label: t("optionOrders") },
+        { key: "leads", color: "#0f9d8d", label: t("optionLeads") },
+        { key: "customers", color: "#f37b00", label: t("optionCustomers") }
+      ];
 
-      const { current, previous, windowSize } = getPeriodSlices();
-      const currentValues = current.map((record) => sanitizeNumber(record[metric]));
-      const previousValues = previous.map((record) => sanitizeNumber(record[metric]));
-      const compareCurrent = state.mode === "cumulative"
-        ? currentValues.map((_, index) => currentValues.slice(0, index + 1).reduce((sum, value) => sum + value, 0))
-        : currentValues;
-      const comparePrevious = state.mode === "cumulative"
-        ? previousValues.map((_, index) => previousValues.slice(0, index + 1).reduce((sum, value) => sum + value, 0))
-        : previousValues;
-
-      const maxValue = Math.max(...series, ...compareCurrent, ...comparePrevious, 1);
-      const ticks = 4;
-      const tickLabels = Array.from({ length: ticks + 1 }, (_, index) => shortValue(metric, maxValue - (maxValue * index) / ticks));
-      padding.left = Math.max(72, Math.ceil(Math.max(...tickLabels.map((label) => measureTextWidth(label, "12px Avenir Next, PingFang SC, Segoe UI, sans-serif"))) + 24));
-      const innerWidth = width - padding.left - padding.right;
-      const innerHeight = height - padding.top - padding.bottom;
-
-      const points = series.map((value, index) => {
-        const x = padding.left + (ordered.length === 1 ? innerWidth / 2 : (innerWidth * index) / (ordered.length - 1));
-        const y = padding.top + innerHeight - (value / maxValue) * innerHeight;
-        return [x, y];
+      const normalizedSeries = seriesConfig.map((series) => {
+        const values = ordered.map((record) => sanitizeNumber(record[series.key]));
+        const max = Math.max(...values, 1);
+        const points = values.map((value, index) => {
+          const x = padding.left + (ordered.length === 1 ? innerWidth / 2 : (innerWidth * index) / (ordered.length - 1));
+          const y = padding.top + innerHeight - (value / max) * innerHeight;
+          return [x, y];
+        });
+        return { ...series, points };
       });
-
-      const previousPoints = comparePrevious.map((value, index) => {
-        const x = padding.left + (windowSize === 1 ? innerWidth / 2 : (innerWidth * index) / (windowSize - 1));
-        const y = padding.top + innerHeight - (value / maxValue) * innerHeight;
-        return [x, y];
-      });
-
-      const path = buildLinePath(points);
-      const areaPath = buildAreaPath(points, height - padding.bottom);
-      const previousPath = buildLinePath(previousPoints);
 
       const grid = Array.from({ length: ticks + 1 }, (_, index) => {
         const y = padding.top + (innerHeight * index) / ticks;
-        const value = maxValue - (maxValue * index) / ticks;
-        return `
-          <line x1="${padding.left}" y1="${y}" x2="${width - padding.right}" y2="${y}" stroke="var(--grid-line)" />
-          <text x="${padding.left - 14}" y="${y + 4}" fill="var(--chart-label)" text-anchor="end" font-size="12">${shortValue(metric, value)}</text>
-        `;
+        return `<line x1="${padding.left}" y1="${y}" x2="${width - padding.right}" y2="${y}" stroke="var(--grid-line)" />`;
       }).join("");
 
       const xLabels = ordered.map((record, index) => {
@@ -1951,24 +1985,29 @@
         return `<text x="${x}" y="${height - 18}" fill="var(--chart-label)" text-anchor="middle" font-size="12">${formatShortDate(record.date)}</text>`;
       }).join("");
 
-      const compareLabel = state.mode === "cumulative"
-        ? t("chartLabelCumulative", { metric: metricLabel(metric) })
-        : t("chartLabelDaily", { metric: metricLabel(metric) });
+      const paths = normalizedSeries.map((series) => `
+        <path d="${buildLinePath(series.points)}" fill="none" stroke="${series.color}" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"></path>
+      `).join("");
 
       elements.chart.innerHTML = `
-        <defs>
-          <linearGradient id="area-fill" x1="0" x2="0" y1="0" y2="1">
-            <stop offset="0%" stop-color="rgba(48, 210, 123, 0.22)"></stop>
-            <stop offset="100%" stop-color="rgba(47, 108, 246, 0.03)"></stop>
-          </linearGradient>
-        </defs>
         ${grid}
-        <text x="${width / 2}" y="18" fill="var(--chart-title)" text-anchor="middle" font-size="16">${compareLabel}</text>
-        <path d="${areaPath}" fill="url(#area-fill)"></path>
-        <path d="${path}" fill="none" stroke="rgba(139, 183, 255, 0.95)" stroke-width="3"></path>
-        ${previousPoints.length ? `<path d="${previousPath}" fill="none" stroke="rgba(223, 180, 142, 0.75)" stroke-width="2.5" stroke-dasharray="7 6"></path>` : ""}
+        <text x="${width / 2}" y="18" fill="var(--chart-title)" text-anchor="middle" font-size="16">${t("chartTitle")}</text>
+        ${paths}
+        <line id="chart-hover-line" x1="0" y1="${padding.top}" x2="0" y2="${height - padding.bottom}" stroke="var(--chart-label)" stroke-width="1.2" stroke-dasharray="4 4" opacity="0"></line>
+        ${normalizedSeries.map((series) => `
+          <circle id="chart-hover-dot-${series.key}" cx="0" cy="0" r="5" fill="${series.color}" stroke="${state.theme === "light" ? "#fff9f1" : "#14110f"}" stroke-width="2" opacity="0"></circle>
+        `).join("")}
         ${xLabels}
       `;
+
+      state.chartHoverData = {
+        width,
+        height,
+        padding,
+        ordered,
+        series: normalizedSeries,
+        xPositions: normalizedSeries[0].points.map((point) => point[0])
+      };
     }
 
     function buildLinePath(points) {
@@ -1991,28 +2030,109 @@
       return `${line} L${last[0]},${baseline} L${first[0]},${baseline} Z`;
     }
 
-    function shortValue(metric, value) {
-      if (metric === "revenue") {
-        return new Intl.NumberFormat(currentLocale(), {
-          style: "currency",
-          currency: currentCurrency(),
-          notation: "compact",
-          maximumFractionDigits: 1
-        }).format(value);
+    function handleChartPointerMove(event) {
+      if (!state.chartHoverData || !state.chartHoverData.ordered.length) {
+        return;
       }
-      return new Intl.NumberFormat(currentLocale(), {
-        notation: "compact",
-        maximumFractionDigits: 1
-      }).format(value);
+
+      const rect = elements.chart.getBoundingClientRect();
+      if (!rect.width || !rect.height) {
+        return;
+      }
+
+      const scaleX = state.chartHoverData.width / rect.width;
+      const localX = (event.clientX - rect.left) * scaleX;
+      const nearestIndex = findNearestChartIndex(localX, state.chartHoverData.xPositions);
+      if (nearestIndex < 0) {
+        hideChartTooltip();
+        return;
+      }
+
+      const record = state.chartHoverData.ordered[nearestIndex];
+      const x = state.chartHoverData.xPositions[nearestIndex];
+      const line = document.getElementById("chart-hover-line");
+      if (line) {
+        line.setAttribute("x1", x);
+        line.setAttribute("x2", x);
+        line.setAttribute("opacity", "1");
+      }
+
+      const tooltipRows = state.chartHoverData.series.map((series) => {
+        const dot = document.getElementById(`chart-hover-dot-${series.key}`);
+        const point = series.points[nearestIndex];
+        if (dot && point) {
+          dot.setAttribute("cx", point[0]);
+          dot.setAttribute("cy", point[1]);
+          dot.setAttribute("opacity", "1");
+        }
+        return `
+          <div class="chart-tooltip-row">
+            <span class="chart-tooltip-label">
+              <i class="chart-tooltip-dot" style="background:${series.color};"></i>
+              ${series.label}
+            </span>
+            <strong class="chart-tooltip-value">${formatChartMetricValue(series.key, record[series.key])}</strong>
+          </div>
+        `;
+      }).join("");
+
+      elements.chartTooltip.innerHTML = `
+        <div class="chart-tooltip-date">${formatDate(record.date)}</div>
+        <div class="chart-tooltip-grid">${tooltipRows}</div>
+      `;
+
+      positionChartTooltip(event.clientX, event.clientY);
+      elements.chartTooltip.classList.add("visible");
+      elements.chartTooltip.setAttribute("aria-hidden", "false");
     }
 
-    function measureTextWidth(text, font) {
-      if (!measureTextWidth.canvas) {
-        measureTextWidth.canvas = document.createElement("canvas");
+    function hideChartTooltip() {
+      elements.chartTooltip.classList.remove("visible");
+      elements.chartTooltip.setAttribute("aria-hidden", "true");
+      const line = document.getElementById("chart-hover-line");
+      if (line) {
+        line.setAttribute("opacity", "0");
       }
-      const context = measureTextWidth.canvas.getContext("2d");
-      context.font = font;
-      return context.measureText(text).width;
+      ["revenue", "orders", "leads", "customers"].forEach((key) => {
+        const dot = document.getElementById(`chart-hover-dot-${key}`);
+        if (dot) {
+          dot.setAttribute("opacity", "0");
+        }
+      });
+    }
+
+    function positionChartTooltip(clientX, clientY) {
+      const wrapRect = elements.chartWrap.getBoundingClientRect();
+      const tooltipRect = elements.chartTooltip.getBoundingClientRect();
+      const offset = 14;
+      let left = clientX - wrapRect.left + offset;
+      let top = clientY - wrapRect.top - tooltipRect.height - offset;
+
+      if (left + tooltipRect.width > wrapRect.width - 8) {
+        left = wrapRect.width - tooltipRect.width - 8;
+      }
+      if (left < 8) {
+        left = 8;
+      }
+      if (top < 8) {
+        top = clientY - wrapRect.top + offset;
+      }
+
+      elements.chartTooltip.style.left = `${left}px`;
+      elements.chartTooltip.style.top = `${top}px`;
+    }
+
+    function findNearestChartIndex(targetX, xPositions) {
+      let nearestIndex = -1;
+      let nearestDistance = Number.POSITIVE_INFINITY;
+      xPositions.forEach((x, index) => {
+        const distance = Math.abs(x - targetX);
+        if (distance < nearestDistance) {
+          nearestDistance = distance;
+          nearestIndex = index;
+        }
+      });
+      return nearestIndex;
     }
 
     function describeChange(delta) {
